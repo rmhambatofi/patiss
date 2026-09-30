@@ -8,6 +8,7 @@ use App\Filament\Forms\DecimalInput;
 use App\Filament\Resources\CakeRequests\CakeRequestResource;
 use App\Models\CakeRequest;
 use App\Settings\ShopSettings;
+use App\Support\Money;
 use Closure;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Checkbox;
@@ -59,17 +60,17 @@ class ViewCakeRequest extends ViewRecord
                     ->helperText('Prérempli avec le tarif de zone : ajoutez le prix du gâteau.')
                     ->live(onBlur: true)
                     ->afterStateUpdated(function (?string $state, Set $set) use ($settings) {
-                        $cents = self::toCents($state);
+                        $cents = Money::tryFromInput($state);
                         if ($cents !== null) {
-                            $set('deposit', number_format(self::depositFor($cents, $settings) / 100, 2, ',', ''));
+                            $set('deposit', Money::toFixedInput(self::depositFor($cents, $settings)));
                         }
                     }),
                 DecimalInput::euros('deposit')
                     ->label('Acompte')
                     ->helperText("Calculé avec le taux de {$settings->deposit_rate_percent} %, modifiable.")
                     ->rule(fn (Get $get): Closure => function (string $attribute, mixed $value, Closure $fail) use ($get) {
-                        $deposit = self::toCents($value);
-                        $total = self::toCents($get('total'));
+                        $deposit = Money::tryFromInput($value);
+                        $total = Money::tryFromInput($get('total'));
                         if ($deposit !== null && $deposit <= 0) {
                             $fail('L’acompte doit être supérieur à 0 €.');
                         } elseif ($deposit !== null && $total !== null && $deposit > $total) {
@@ -141,14 +142,5 @@ class ViewCakeRequest extends ViewRecord
     private static function depositFor(int $totalCents, ShopSettings $settings): int
     {
         return (int) round($totalCents * ($settings->deposit_rate_percent ?? 0) / 100);
-    }
-
-    private static function toCents(mixed $value): ?int
-    {
-        if (! is_string($value) || ! preg_match('/^\d+([.,]\d{1,2})?$/', $value)) {
-            return null;
-        }
-
-        return (int) round((float) str_replace(',', '.', $value) * 100);
     }
 }

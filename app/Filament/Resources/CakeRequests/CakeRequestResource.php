@@ -7,10 +7,10 @@ use App\Enums\RequestStatus;
 use App\Filament\Resources\CakeRequests\Pages\ListCakeRequests;
 use App\Filament\Resources\CakeRequests\Pages\ViewCakeRequest;
 use App\Models\CakeRequest;
-use App\Models\CakeType;
 use App\Models\DepositLink;
 use App\Models\RequestPhoto;
 use App\Services\CapacityGuard;
+use App\Support\Money;
 use BackedEnum;
 use Filament\Actions\ViewAction;
 use Filament\Infolists\Components\ImageEntry;
@@ -93,7 +93,7 @@ class CakeRequestResource extends Resource
 
     public static function infolist(Schema $schema): Schema
     {
-        $euros = fn (?int $cents): ?string => $cents === null ? null : CakeType::formatEuros($cents);
+        $euros = fn (?int $cents): ?string => $cents === null ? null : Money::format($cents);
 
         return $schema
             ->columns(1)

@@ -9,7 +9,7 @@ Votre paiement est arrivé juste après celui d’un autre client, et la date du
 Le lien que vous avez utilisé n’est plus valable : l’offre a été remplacée ou retirée entre-temps. Votre date n’est donc pas réservée.
 @endif
 
-Votre acompte de {{ \App\Models\CakeType::formatEuros($amountCents) }} vous est remboursé intégralement, sur la carte utilisée. Le remboursement apparaît sous quelques jours ouvrés.
+Votre acompte de {{ \App\Support\Money::format($amountCents) }} vous est remboursé intégralement, sur la carte utilisée. Le remboursement apparaît sous quelques jours ouvrés.
 
 **Référence :** {{ $request->reference }}
 

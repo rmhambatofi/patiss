@@ -16,8 +16,8 @@ class RequestPhotoController extends Controller
     public function __invoke(Request $request, RequestPhoto $photo): StreamedResponse
     {
         abort_unless($request->user()?->canAccessPanel(Filament::getPanel('atelier')), 403);
-        abort_unless(Storage::disk('local')->exists($photo->path), 404);
+        abort_unless(Storage::disk(RequestPhoto::DISK)->exists($photo->path), 404);
 
-        return Storage::disk('local')->response($photo->path, headers: ['Cache-Control' => 'private, no-store']);
+        return Storage::disk(RequestPhoto::DISK)->response($photo->path, headers: ['Cache-Control' => 'private, no-store']);
     }
 }

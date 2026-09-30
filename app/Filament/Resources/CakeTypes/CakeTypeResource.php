@@ -9,6 +9,7 @@ use App\Filament\Resources\CakeTypes\Pages\EditCakeType;
 use App\Filament\Resources\CakeTypes\Pages\ListCakeTypes;
 use App\Models\CakeType;
 use App\Services\ImageSanitizer;
+use App\Support\Money;
 use BackedEnum;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\CheckboxList;
@@ -167,7 +168,7 @@ class CakeTypeResource extends Resource
                 TextColumn::make('name')->label('Nom')->searchable(),
                 TextColumn::make('from_price_cents')
                     ->label('À partir de')
-                    ->formatStateUsing(fn (int $state): string => CakeType::formatEuros($state)),
+                    ->formatStateUsing(fn (int $state): string => Money::format($state)),
                 TextColumn::make('photos_count')->label('Photos')->counts('photos'),
                 IconColumn::make('is_published')->label('Publié')->boolean(),
             ])

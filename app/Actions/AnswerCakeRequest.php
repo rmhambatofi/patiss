@@ -60,7 +60,7 @@ class AnswerCakeRequest
 
             $request->update(['status' => RequestStatus::Proposee, 'last_activity_at' => now()]);
 
-            Mail::to($request->email)->queue(new DepositOffer($link, url('/acompte/'.$token)));
+            Mail::to($request->email)->queue(new DepositOffer($link, route('deposit.show', $token)));
 
             return $link;
         });

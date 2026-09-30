@@ -24,11 +24,9 @@ class DeliveryZoneResolver
             return null;
         }
 
-        $distance = (float) $commune->distance_km;
-
         return DeliveryTier::query()
+            ->where('max_km', '>=', (float) $commune->distance_km)
             ->orderBy('max_km')
-            ->get()
-            ->first(fn (DeliveryTier $tier) => (float) $tier->max_km >= $distance);
+            ->first();
     }
 }

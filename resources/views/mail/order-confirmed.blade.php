@@ -1,4 +1,4 @@
-@php($euros = fn (int $cents) => \App\Models\CakeType::formatEuros($cents))
+@php($euros = fn (int $cents) => \App\Support\Money::format($cents))
 <x-mail::message>
 # Votre commande est confirmée
 

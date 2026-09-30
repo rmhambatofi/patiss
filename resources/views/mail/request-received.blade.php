@@ -10,7 +10,7 @@ Merci pour votre demande. Voici son récapitulatif.
 **Nombre de parts :** {{ $request->portions }} parts<br>
 **Date de l’événement :** {{ $request->event_date->locale('fr')->translatedFormat('l j F Y') }}<br>
 @if ($request->fulfilment === \App\Enums\Fulfilment::Delivery)
-**Livraison :** {{ $request->commune?->name }}@if ($request->delivery_fee_cents !== null), tarif de zone {{ \App\Models\CakeType::formatEuros($request->delivery_fee_cents) }}@endif
+**Livraison :** {{ $request->commune?->name }}@if ($request->delivery_fee_cents !== null), tarif de zone {{ \App\Support\Money::format($request->delivery_fee_cents) }}@endif
 @else
 **Retrait :** gratuit, à Dammartin-en-Goële (l’adresse vous sera donnée à la confirmation)
 @endif

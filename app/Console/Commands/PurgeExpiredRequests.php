@@ -6,6 +6,7 @@ use App\Enums\RequestStatus;
 use App\Models\CakeRequest;
 use App\Models\DepositLink;
 use App\Models\Payment;
+use App\Models\RequestPhoto;
 use App\Models\RequestStat;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Builder;
@@ -95,7 +96,7 @@ class PurgeExpiredRequests extends Command
         ]);
 
         // On the local disk, an absent directory is a no-op, not an error.
-        Storage::disk('local')->deleteDirectory('requests/'.$request->reference);
+        Storage::disk(RequestPhoto::DISK)->deleteDirectory(RequestPhoto::directoryFor($request->reference));
 
         // Stripe ids, amount, status and refund stay for accounting; the e-mail goes.
         (clone $payments)->update(['payer_email' => null]);

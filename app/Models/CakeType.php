@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\Allergen;
+use App\Support\Money;
 use Database\Factories\CakeTypeFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
@@ -69,7 +70,7 @@ class CakeType extends Model
 
     public function fromPriceLabel(): string
     {
-        return 'à partir de '.self::formatEuros($this->from_price_cents);
+        return 'à partir de '.Money::format($this->from_price_cents);
     }
 
     /**
@@ -86,12 +87,5 @@ class CakeType extends Model
         $last = array_pop($formats);
 
         return ($formats === [] ? $last : implode(', ', $formats).' ou '.$last).' parts';
-    }
-
-    public static function formatEuros(int $cents): string
-    {
-        $decimals = $cents % 100 === 0 ? 0 : 2;
-
-        return number_format($cents / 100, $decimals, ',', ' ').' €';
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Forms;
 
+use App\Support\Money;
 use Filament\Forms\Components\TextInput;
 
 /**
@@ -9,8 +10,6 @@ use Filament\Forms\Components\TextInput;
  */
 class DecimalInput
 {
-    private const PATTERN = '/^\d+([.,]\d{1,2})?$/';
-
     /**
      * An amount typed in euros and stored in cents.
      */
@@ -20,15 +19,13 @@ class DecimalInput
             ->required()
             ->inputMode('decimal')
             ->suffix('€')
-            ->regex(self::PATTERN)
+            ->regex(Money::INPUT_PATTERN)
             ->validationMessages([
                 'required' => 'Indiquez un prix en euros.',
                 'regex' => 'Indiquez un prix positif en euros, par exemple 45 ou 12,50.',
             ])
-            ->formatStateUsing(fn ($state) => $state === null ? null : ((int) $state % 100 === 0
-                ? (string) intdiv((int) $state, 100)
-                : number_format($state / 100, 2, ',', '')))
-            ->dehydrateStateUsing(fn (string $state): int => (int) round(self::toFloat($state) * 100));
+            ->formatStateUsing(fn ($state) => $state === null ? null : Money::toInput((int) $state))
+            ->dehydrateStateUsing(fn (string $state): int => Money::fromInput($state));
     }
 
     /**
@@ -40,9 +37,9 @@ class DecimalInput
             ->required()
             ->inputMode('decimal')
             ->suffix('km')
-            ->regex(self::PATTERN)
+            ->regex(Money::INPUT_PATTERN)
             ->rule(fn () => function (string $attribute, mixed $value, \Closure $fail) {
-                if (is_string($value) && preg_match(self::PATTERN, $value) && self::toFloat($value) <= 0) {
+                if (is_string($value) && preg_match(Money::INPUT_PATTERN, $value) && Money::parseDecimal($value) <= 0) {
                     $fail('La distance doit être supérieure à 0 km.');
                 }
             })
@@ -51,11 +48,6 @@ class DecimalInput
                 'regex' => 'Indiquez une distance positive en kilomètres, par exemple 10 ou 12,5.',
             ])
             ->formatStateUsing(fn ($state) => $state === null ? null : rtrim(rtrim(number_format((float) $state, 2, ',', ''), '0'), ','))
-            ->dehydrateStateUsing(fn (string $state): string => number_format(self::toFloat($state), 2, '.', ''));
-    }
-
-    private static function toFloat(string $value): float
-    {
-        return (float) str_replace(',', '.', $value);
+            ->dehydrateStateUsing(fn (string $state): string => number_format(Money::parseDecimal($state), 2, '.', ''));
     }
 }

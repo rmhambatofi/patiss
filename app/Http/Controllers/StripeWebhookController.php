@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\Fulfilment;
+use App\Enums\RefundReason;
 use App\Enums\RequestStatus;
 use App\Mail\DepositRefunded;
 use App\Mail\DepositRefundedForArtisan;
@@ -31,11 +32,6 @@ use Stripe\Webhook;
  */
 class StripeWebhookController extends Controller
 {
-    /** Reasons a paid session is refunded, as told to the client. */
-    public const REASON_FULL = 'full';
-
-    public const REASON_INVALID = 'invalid';
-
     public function __construct(
         private StripeGateway $stripe,
         private CapacityGuard $capacity,
@@ -104,7 +100,7 @@ class StripeWebhookController extends Controller
     /**
      * @param  array<string, mixed>  $session
      */
-    private function refusalReason(array $session, ?DepositLink $link, ?CakeRequest $request): ?string
+    private function refusalReason(array $session, ?DepositLink $link, ?CakeRequest $request): ?RefundReason
     {
         $stillValid = $link !== null
             && $request !== null
@@ -114,10 +110,10 @@ class StripeWebhookController extends Controller
             && $request->status === RequestStatus::Proposee;
 
         if (! $stillValid) {
-            return self::REASON_INVALID;
+            return RefundReason::Invalid;
         }
 
-        return $this->capacity->isFull($request->event_date) ? self::REASON_FULL : null;
+        return $this->capacity->isFull($request->event_date) ? RefundReason::Full : null;
     }
 
     /**
@@ -153,20 +149,20 @@ class StripeWebhookController extends Controller
     /**
      * @param  array<string, mixed>  $session
      */
-    private function refund(array $session, ?DepositLink $link, ?CakeRequest $request, string $reason): void
+    private function refund(array $session, ?DepositLink $link, ?CakeRequest $request, RefundReason $reason): void
     {
         // Refund first: if Stripe fails, nothing is recorded and Stripe retries the webhook.
         $refundId = $this->stripe->refundPaymentIntent((string) $session['payment_intent']);
         $payment = $this->recordPayment($session, $link, $request, Payment::STATUS_REFUNDED, $refundId);
 
-        if ($reason === self::REASON_FULL) {
+        if ($reason === RefundReason::Full) {
             $request->update(['status' => RequestStatus::Remboursee, 'last_activity_at' => now()]);
         }
 
         Log::warning('Acompte Stripe remboursé', [
             'reference' => $request?->reference,
             'session' => $session['id'],
-            'reason' => $reason,
+            'reason' => $reason->value,
         ]);
 
         if ($request !== null) {

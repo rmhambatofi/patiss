@@ -3,27 +3,17 @@
 namespace App\Mail;
 
 use App\Models\CakeRequest;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Mail\Mailable;
+use Filament\Facades\Filament;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
-use Illuminate\Queue\SerializesModels;
 
 /**
  * Notification to the artisan: type, date, commune and a link to the atelier
  * only. No allergies, phone, customization or photo, so the mailbox never
  * becomes a copy of health data (KTD8, R19).
  */
-class NewRequestForArtisan extends Mailable implements ShouldQueue
+class NewRequestForArtisan extends QueuedMail
 {
-    use Queueable, SerializesModels;
-
-    public int $tries = 5;
-
-    /** @var list<int> */
-    public array $backoff = [60, 300, 1800];
-
     public function __construct(public CakeRequest $cakeRequest) {}
 
     public function envelope(): Envelope
@@ -41,7 +31,7 @@ class NewRequestForArtisan extends Mailable implements ShouldQueue
             'eventDate' => $this->cakeRequest->event_date,
             'outOfLeadTime' => $this->cakeRequest->out_of_lead_time,
             'communeName' => $this->cakeRequest->commune?->name,
-            'atelierUrl' => url('/atelier'),
+            'atelierUrl' => Filament::getPanel('atelier')->getUrl(),
         ]);
     }
 }

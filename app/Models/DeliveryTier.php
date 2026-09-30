@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\Money;
 use Database\Factories\DeliveryTierFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -36,11 +37,7 @@ class DeliveryTier extends Model
     /** "5 €" or "12,50 €". */
     public function priceLabel(): string
     {
-        $price = $this->price_cents % 100 === 0
-            ? number_format($this->price_cents / 100, 0, ',', ' ')
-            : number_format($this->price_cents / 100, 2, ',', ' ');
-
-        return $price.' €';
+        return Money::format($this->price_cents);
     }
 
     private static function trimDecimals(string $number): string

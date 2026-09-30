@@ -14,12 +14,4 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(StripeGateway::class, fn () => new StripeGateway(config('services.stripe.secret')));
     }
-
-    /**
-     * Bootstrap any application services.
-     */
-    public function boot(): void
-    {
-        //
-    }
 }

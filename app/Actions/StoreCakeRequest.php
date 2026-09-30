@@ -30,8 +30,6 @@ use Throwable;
  */
 class StoreCakeRequest
 {
-    private const DISK = 'local';
-
     public function __construct(
         private ImageSanitizer $sanitizer,
         private DeliveryZoneResolver $resolver,
@@ -50,7 +48,7 @@ class StoreCakeRequest
         array $inspirations = [],
     ): CakeRequest {
         $reference = CakeRequest::generateReference();
-        $directory = 'requests/'.$reference;
+        $directory = RequestPhoto::directoryFor($reference);
         $fulfilment = Fulfilment::from($data['fulfilment']);
         $eventDate = Carbon::createFromFormat('Y-m-d', $data['event_date'])->startOfDay();
         $leadDays = $type ? $type->min_lead_days : $this->settings->free_request_lead_days;
@@ -101,7 +99,7 @@ class StoreCakeRequest
                 return $request;
             });
         } catch (Throwable $e) {
-            Storage::disk(self::DISK)->deleteDirectory($directory);
+            Storage::disk(RequestPhoto::DISK)->deleteDirectory($directory);
 
             throw $e;
         }
@@ -113,10 +111,10 @@ class StoreCakeRequest
      */
     private function storePhoto(UploadedFile $file, string $directory): string
     {
-        $disk = Storage::disk(self::DISK);
+        $disk = Storage::disk(RequestPhoto::DISK);
 
         try {
-            $path = $this->sanitizer->store($file, self::DISK, $directory);
+            $path = $this->sanitizer->store($file, RequestPhoto::DISK, $directory);
         } catch (DecoderException|NotSupportedException) {
             $extension = strtolower($file->guessExtension() ?? $file->getClientOriginalExtension() ?: 'bin');
             $path = $disk->putFileAs($directory, $file, Str::random(40).'.'.$extension) ?: null;

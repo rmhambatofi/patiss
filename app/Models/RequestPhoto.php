@@ -18,6 +18,9 @@ class RequestPhoto extends Model
 
     public const KIND_INSPIRATION = 'inspiration';
 
+    /** The private disk request photos live on. */
+    public const DISK = 'local';
+
     protected $fillable = ['kind', 'path', 'original_name'];
 
     /**
@@ -26,5 +29,11 @@ class RequestPhoto extends Model
     public function cakeRequest(): BelongsTo
     {
         return $this->belongsTo(CakeRequest::class);
+    }
+
+    /** Where the photos of one request are stored on DISK. */
+    public static function directoryFor(string $reference): string
+    {
+        return 'requests/'.$reference;
     }
 }
