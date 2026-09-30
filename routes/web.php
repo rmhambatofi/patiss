@@ -31,3 +31,8 @@ Route::middleware(EnsureShopIsOpen::class)->controller(CakeRequestController::cl
         ->middleware('throttle:5,60')
         ->name('request.type.store');
 });
+
+// Legal pages (U10): templates that read the shop settings (KTD10). They never show the pickup address.
+Route::view('/mentions-legales', 'legal.mentions-legales')->name('legal.notice');
+Route::view('/cgv', 'legal.cgv')->name('legal.terms');
+Route::view('/confidentialite', 'legal.confidentialite')->name('legal.privacy');
