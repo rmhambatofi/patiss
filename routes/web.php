@@ -3,6 +3,7 @@
 use App\Http\Controllers\CakeRequestController;
 use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\CommuneSearchController;
+use App\Http\Controllers\RequestPhotoController;
 use App\Http\Middleware\EnsureShopIsOpen;
 use App\Models\DeliveryTier;
 use Illuminate\Support\Facades\Route;
@@ -32,7 +33,11 @@ Route::middleware(EnsureShopIsOpen::class)->controller(CakeRequestController::cl
         ->name('request.type.store');
 });
 
+// Legal pages (U10): templates that read the shop settings (KTD10). They never show the pickup address.
+Route::view('/mentions-legales', 'legal.mentions-legales')->name('legal.notice');
+Route::view('/cgv', 'legal.cgv')->name('legal.terms');
+Route::view('/confidentialite', 'legal.confidentialite')->name('legal.privacy');
+
 // Atelier (U7): private request photos, served only to a logged-in atelier account (KTD7).
-// Class named as a string so this block needs no import at the top of the file.
-Route::get('/atelier-fichiers/photos/{photo}', 'App\Http\Controllers\RequestPhotoController')
+Route::get('/atelier-fichiers/photos/{photo}', RequestPhotoController::class)
     ->name('atelier.request-photo');
