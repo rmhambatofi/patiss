@@ -1,0 +1,23 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\RequestPhoto;
+use Filament\Facades\Filament;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+
+/**
+ * Serves a request photo from the private disk to atelier accounts only (KTD7).
+ */
+class RequestPhotoController extends Controller
+{
+    public function __invoke(Request $request, RequestPhoto $photo): StreamedResponse
+    {
+        abort_unless($request->user()?->canAccessPanel(Filament::getPanel('atelier')), 403);
+        abort_unless(Storage::disk('local')->exists($photo->path), 404);
+
+        return Storage::disk('local')->response($photo->path, headers: ['Cache-Control' => 'private, no-store']);
+    }
+}

@@ -119,4 +119,12 @@ class CakeRequest extends Model
     {
         return $this->hasMany(RequestPhoto::class)->orderBy('id');
     }
+
+    /**
+     * @return HasMany<DepositLink, $this>
+     */
+    public function depositLinks(): HasMany
+    {
+        return $this->hasMany(DepositLink::class);
+    }
 }
