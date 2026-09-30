@@ -75,7 +75,15 @@ class StripeWebhookController extends Controller
             return;
         }
 
-        $link = DepositLink::with('cakeRequest')->find(data_get($session, 'metadata.deposit_link_id'));
+        $linkId = data_get($session, 'metadata.deposit_link_id');
+        if (blank($linkId)) {
+            // Not a deposit session of this site (e.g. a Stripe Payment Link): not ours to refund.
+            Log::info('Session Stripe sans acompte ignorée', ['session' => $session['id']]);
+
+            return;
+        }
+
+        $link = DepositLink::with('cakeRequest')->find($linkId);
         $request = $link?->cakeRequest;
         $lockKey = $request !== null
             ? 'capacity:'.$request->event_date->toDateString()
@@ -107,7 +115,8 @@ class StripeWebhookController extends Controller
             && $link->status === DepositLink::STATUS_ACTIVE
             // A session opened before the link expired stays payable for its 30 minutes (KTD4).
             && (int) ($session['created'] ?? PHP_INT_MAX) <= $link->expires_at->getTimestamp()
-            && $request->status === RequestStatus::Proposee;
+            && $request->status === RequestStatus::Proposee
+            && ! $request->event_date->isBefore(today());
 
         if (! $stillValid) {
             return RefundReason::Invalid;

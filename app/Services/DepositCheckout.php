@@ -48,6 +48,7 @@ class DepositCheckout
             $link->expires_at->isPast() => self::EXPIRED,
             $request->status === RequestStatus::Remboursee => self::FULL,
             $request->status !== RequestStatus::Proposee => self::REPLACED,
+            $request->event_date->isBefore(today()) => self::EXPIRED,
             $this->capacity->isFull($request->event_date) => self::FULL,
             default => null,
         };

@@ -188,6 +188,28 @@ it('keeps purging the other requests when a private file is already gone', funct
         ->and(Storage::disk('local')->exists('requests/OTH234'))->toBeFalse();
 });
 
+it('rolls back a request whose photos cannot be deleted, purges the others and fails', function () {
+    $stuck = reservedRequestWithPayment('BAD234', now()->subMonths(4)->toDateString());
+    $other = reservedRequestWithPayment('GOOD34', now()->subMonths(4)->toDateString());
+
+    // The directory stays on disk and deleteDirectory reports failure (local disk, throw => false).
+    $disk = Mockery::mock(Storage::disk('local'))->makePartial();
+    $disk->shouldReceive('deleteDirectory')->with('requests/BAD234')->andReturn(false);
+    Storage::set('local', $disk);
+
+    $this->artisan('requests:purge')
+        ->expectsOutputToContain('Demandes en échec : 1')
+        ->assertFailed();
+
+    expect(CakeRequest::pluck('id')->all())->toBe([$stuck->id])
+        ->and(RequestStat::count())->toBe(1)
+        ->and($stuck->depositLinks()->count())->toBe(2)
+        ->and(Payment::where('cake_request_id', $stuck->id)->value('payer_email'))->toBe('lea@example.test')
+        ->and(Storage::disk('local')->exists('requests/BAD234/photo-1.jpg'))->toBeTrue()
+        ->and(Storage::disk('local')->exists('requests/GOOD34'))->toBeFalse()
+        ->and(CakeRequest::whereKey($other->id)->exists())->toBeFalse();
+});
+
 it('changes nothing when run twice the same day', function () {
     reservedRequestWithPayment('TWI234', now()->subMonths(4)->toDateString());
     $kept = reservedRequestWithPayment('TWK234', now()->subMonth()->toDateString());

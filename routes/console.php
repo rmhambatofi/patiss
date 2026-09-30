@@ -12,3 +12,8 @@ Schedule::command('queue:work --stop-when-empty --max-time=50 --tries=3')
 Schedule::command('requests:purge')
     ->dailyAt('03:30')
     ->withoutOverlapping();
+
+// Proposee --> Expiree once the link or the event date has passed.
+Schedule::command('requests:expire-offers')
+    ->hourly()
+    ->withoutOverlapping();

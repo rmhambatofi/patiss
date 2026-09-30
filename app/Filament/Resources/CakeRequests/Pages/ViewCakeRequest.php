@@ -10,6 +10,7 @@ use App\Models\CakeRequest;
 use App\Settings\ShopSettings;
 use App\Support\Money;
 use Closure;
+use DomainException;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\CheckboxList;
@@ -26,6 +27,9 @@ use Filament\Schemas\Components\Utilities\Set;
 class ViewCakeRequest extends ViewRecord
 {
     protected static string $resource = CakeRequestResource::class;
+
+    /** Stripe Checkout refuses a euro amount under 0,50 €. */
+    private const MIN_DEPOSIT_CENTS = 50;
 
     protected function getHeaderActions(): array
     {
@@ -71,8 +75,8 @@ class ViewCakeRequest extends ViewRecord
                     ->rule(fn (Get $get): Closure => function (string $attribute, mixed $value, Closure $fail) use ($get) {
                         $deposit = Money::tryFromInput($value);
                         $total = Money::tryFromInput($get('total'));
-                        if ($deposit !== null && $deposit <= 0) {
-                            $fail('L’acompte doit être supérieur à 0 €.');
+                        if ($deposit !== null && $deposit < self::MIN_DEPOSIT_CENTS) {
+                            $fail('L’acompte doit être d’au moins 0,50 € (minimum accepté par Stripe).');
                         } elseif ($deposit !== null && $total !== null && $deposit > $total) {
                             $fail('L’acompte ne peut pas dépasser le prix total.');
                         }
@@ -103,14 +107,20 @@ class ViewCakeRequest extends ViewRecord
                     ->minValue(1),
             ])
             ->action(function (CakeRequest $record, array $data) {
-                app(AnswerCakeRequest::class)->propose($record, [
-                    'total_cents' => $data['total'],
-                    'deposit_cents' => $data['deposit'],
-                    'allergens' => array_values($data['allergens'] ?? []),
-                    'slot' => $data['slot'],
-                    'message' => $data['message'] ?? null,
-                    'validity_days' => (int) $data['validity_days'],
-                ]);
+                try {
+                    app(AnswerCakeRequest::class)->propose($record, [
+                        'total_cents' => $data['total'],
+                        'deposit_cents' => $data['deposit'],
+                        'allergens' => array_values($data['allergens'] ?? []),
+                        'slot' => $data['slot'],
+                        'message' => $data['message'] ?? null,
+                        'validity_days' => (int) $data['validity_days'],
+                    ]);
+                } catch (DomainException $e) {
+                    self::notifyChanged($e);
+
+                    return;
+                }
 
                 Notification::make()->success()->title('Proposition envoyée')->send();
             });
@@ -133,10 +143,21 @@ class ViewCakeRequest extends ViewRecord
                     ->rows(6),
             ])
             ->action(function (CakeRequest $record, array $data) {
-                app(AnswerCakeRequest::class)->decline($record, $data['message']);
+                try {
+                    app(AnswerCakeRequest::class)->decline($record, $data['message']);
+                } catch (DomainException $e) {
+                    self::notifyChanged($e);
+
+                    return;
+                }
 
                 Notification::make()->success()->title('Refus envoyé')->send();
             });
+    }
+
+    private static function notifyChanged(DomainException $e): void
+    {
+        Notification::make()->danger()->title('Cette demande a changé entre-temps')->body($e->getMessage())->send();
     }
 
     private static function depositFor(int $totalCents, ShopSettings $settings): int

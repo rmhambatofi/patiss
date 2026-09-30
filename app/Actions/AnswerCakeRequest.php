@@ -8,6 +8,7 @@ use App\Mail\RequestDeclined;
 use App\Models\CakeRequest;
 use App\Models\DepositLink;
 use App\Services\StripeGateway;
+use DomainException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -45,6 +46,7 @@ class AnswerCakeRequest
         $openSessions = [];
 
         $link = DB::transaction(function () use ($request, $offer, $token, &$openSessions) {
+            $this->lockAnswerable($request, self::PROPOSABLE);
             $openSessions = $this->deactivateLinks($request);
 
             $link = $request->depositLinks()->create([
@@ -73,6 +75,7 @@ class AnswerCakeRequest
     public function decline(CakeRequest $request, string $message): void
     {
         $openSessions = DB::transaction(function () use ($request, $message) {
+            $this->lockAnswerable($request, self::DECLINABLE);
             $openSessions = $this->deactivateLinks($request);
             $request->update(['status' => RequestStatus::Refusee, 'last_activity_at' => now()]);
 
@@ -91,6 +94,23 @@ class AnswerCakeRequest
         return "Bonjour {$request->name},\n\n"
             ."Merci beaucoup pour votre demande. Malheureusement, je ne peux pas réaliser votre gâteau pour le {$date}.\n\n"
             .'J’espère avoir l’occasion de vous régaler une prochaine fois.';
+    }
+
+    /**
+     * Re-reads the status under a row lock: a deposit the webhook reserved since the
+     * page was loaded must never be overwritten by the artisan's answer.
+     *
+     * @param  list<RequestStatus>  $allowed
+     *
+     * @throws DomainException
+     */
+    private function lockAnswerable(CakeRequest $request, array $allowed): void
+    {
+        $current = CakeRequest::whereKey($request->getKey())->lockForUpdate()->first(['id', 'status']);
+
+        if ($current === null || ! in_array($current->status, $allowed, true)) {
+            throw new DomainException('Cette demande a changé entre-temps (acompte payé ou remboursé) : rechargez la page.');
+        }
     }
 
     /**

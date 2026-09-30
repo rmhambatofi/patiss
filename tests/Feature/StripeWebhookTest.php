@@ -214,6 +214,43 @@ it('accepts a session opened before the link expired, but refunds one opened aft
         ->and($this->stripe->refunded)->toBe(['pi_test_link'.$other->id]);
 });
 
+it('refunds in full a session paid after the event date has passed, without reserving or sending the address', function () {
+    $event = checkoutCompletedEvent($this->link);
+    $this->request->update(['event_date' => '2026-09-30']);
+
+    postStripeWebhook($event)->assertOk();
+
+    expect($this->request->fresh()->status)->toBe(RequestStatus::Proposee)
+        ->and($this->link->fresh()->status)->toBe(DepositLink::STATUS_ACTIVE)
+        ->and(Payment::sole()->status)->toBe(Payment::STATUS_REFUNDED)
+        ->and($this->stripe->refunded)->toBe(['pi_test_link'.$this->link->id]);
+
+    $refundMail = mailsTo('client@example.test')->sole();
+    expect($refundMail['subject'])->toContain('rembours')
+        ->and($refundMail['body'])->toContain('n’est plus valable');
+
+    sentMails()->each(fn (array $mail) => expect($mail['body'])->not->toContain('impasse des Tilleuls'));
+});
+
+it('ignores a paid session this site did not create: no refund, no payment, no e-mail', function () {
+    postStripeWebhook(checkoutCompletedEvent($this->link, ['id' => 'cs_test_payment_link', 'payment_intent' => 'pi_test_payment_link', 'metadata' => []]))
+        ->assertOk();
+
+    expect($this->stripe->refunded)->toBe([])
+        ->and(Payment::count())->toBe(0)
+        ->and(sentMails())->toBeEmpty()
+        ->and($this->request->fresh()->status)->toBe(RequestStatus::Proposee);
+});
+
+it('still refunds a session whose deposit link no longer exists, and tells the artisan', function () {
+    postStripeWebhook(checkoutCompletedEvent($this->link, ['id' => 'cs_test_orphan', 'payment_intent' => 'pi_test_orphan', 'metadata' => ['deposit_link_id' => '999999']]))
+        ->assertOk();
+
+    expect($this->stripe->refunded)->toBe(['pi_test_orphan'])
+        ->and(Payment::sole()->status)->toBe(Payment::STATUS_REFUNDED)
+        ->and(mailsTo('atelier@example.test'))->toHaveCount(1);
+});
+
 it('covers R20: two payments for a capacity-1 date leave one reserved and one refunded, client and artisan told', function () {
     CapacityOverride::create(['date' => '2026-11-14', 'capacity' => 1]);
     $second = secondRequestSameDay();

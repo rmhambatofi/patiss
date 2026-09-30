@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use RuntimeException;
 use Throwable;
 
 /**
@@ -96,7 +97,13 @@ class PurgeExpiredRequests extends Command
         ]);
 
         // On the local disk, an absent directory is a no-op, not an error.
-        Storage::disk(RequestPhoto::DISK)->deleteDirectory(RequestPhoto::directoryFor($request->reference));
+        // A real failure must roll back so the request is retried, not orphan the photos.
+        $disk = Storage::disk(RequestPhoto::DISK);
+        $directory = RequestPhoto::directoryFor($request->reference);
+
+        if (! $disk->deleteDirectory($directory) && $disk->exists($directory)) {
+            throw new RuntimeException("Impossible de supprimer les photos de la demande {$request->reference}");
+        }
 
         // Stripe ids, amount, status and refund stay for accounting; the e-mail goes.
         (clone $payments)->update(['payer_email' => null]);

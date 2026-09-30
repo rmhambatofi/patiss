@@ -15,7 +15,9 @@ class RequestPhotoController extends Controller
 {
     public function __invoke(Request $request, RequestPhoto $photo): StreamedResponse
     {
-        abort_unless($request->user()?->canAccessPanel(Filament::getPanel('atelier')), 403);
+        $user = $request->user();
+        // Outside the panel, so its MFA set-up middleware does not apply: require the enrolled e-mail code here.
+        abort_unless($user?->canAccessPanel(Filament::getPanel('atelier')) && $user->hasEmailAuthentication(), 403);
         abort_unless(Storage::disk(RequestPhoto::DISK)->exists($photo->path), 404);
 
         return Storage::disk(RequestPhoto::DISK)->response($photo->path, headers: ['Cache-Control' => 'private, no-store']);

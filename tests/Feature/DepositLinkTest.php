@@ -86,6 +86,26 @@ it('covers AE6: an expired link shows "lien expiré" and never opens a Stripe se
     expect($this->stripe->created)->toBe([]);
 });
 
+it('shows "lien expiré" once the event date has passed, and never opens a Stripe session', function () {
+    $this->request->update(['event_date' => '2026-09-30']);
+
+    $this->get('/acompte/'.LINK_TOKEN)
+        ->assertOk()
+        ->assertSee('Ce lien a expiré')
+        ->assertDontSee('name="cgv"', false);
+    payLink()->assertOk()->assertSee('Ce lien a expiré');
+
+    expect($this->stripe->created)->toBe([]);
+});
+
+it('keeps the link payable on the event date itself', function () {
+    $this->request->update(['event_date' => '2026-10-01']);
+
+    payLink()->assertRedirect('https://checkout.stripe.com/c/pay/cs_test_fake1');
+
+    expect($this->stripe->created)->toHaveCount(1);
+});
+
 it('shows "lien remplacé" for a link deactivated by a new proposal', function () {
     $this->link->update(['status' => DepositLink::STATUS_REPLACED]);
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Actions\AnswerCakeRequest;
 use App\Enums\Allergen;
 use App\Enums\Fulfilment;
 use App\Enums\RequestStatus;
@@ -171,6 +172,63 @@ it('refuses a deposit larger than the total price', function () {
     expect(DepositLink::count())->toBe(0);
 });
 
+it('refuses a deposit below Stripe’s 0,50 € minimum', function () {
+    Livewire::test(ViewCakeRequest::class, ['record' => $this->request->getRouteKey()])
+        ->callAction('propose', [
+            'total' => '85', 'deposit' => '0,40', 'allergens' => [Allergen::Eggs->value],
+            'slot' => 'Samedi 14 novembre', 'validity_days' => 3,
+        ])
+        ->assertHasActionErrors(['deposit']);
+    expect(DepositLink::count())->toBe(0);
+    Mail::assertNothingQueued();
+
+    proposeOffer($this->request, ['deposit' => '0,50']);
+    expect(DepositLink::sole()->deposit_cents)->toBe(50);
+});
+
+it('never overwrites a request reserved by the webhook in the meantime', function () {
+    proposeOffer($this->request);
+    $link = DepositLink::sole();
+    $stale = CakeRequest::find($this->request->id);
+    // The webhook reserves the request after the artisan's page was loaded.
+    CakeRequest::whereKey($this->request->id)->update(['status' => RequestStatus::Reservee]);
+    $link->update(['status' => DepositLink::STATUS_PAID]);
+    Mail::fake();
+
+    $answer = app(AnswerCakeRequest::class);
+    expect(fn () => $answer->propose($stale, [
+        'total_cents' => 9000, 'deposit_cents' => 2700, 'allergens' => [],
+        'slot' => 'Samedi', 'message' => null, 'validity_days' => 3,
+    ]))->toThrow(DomainException::class);
+    expect(fn () => $answer->decline($stale, 'Désolée'))->toThrow(DomainException::class);
+
+    expect($this->request->refresh()->status)->toBe(RequestStatus::Reservee)
+        ->and(DepositLink::sole()->status)->toBe(DepositLink::STATUS_PAID);
+    Mail::assertNothingQueued();
+});
+
+it('shows a danger notification when the request is reserved during the answer', function () {
+    // The page still shows the actions: the webhook reserves the request while the answer runs.
+    $answer = Mockery::mock(AnswerCakeRequest::class);
+    $answer->shouldReceive('decline')->andThrow(new DomainException('Cette demande a changé entre-temps (acompte payé ou remboursé) : rechargez la page.'));
+    $answer->shouldReceive('propose')->andThrow(new DomainException('Cette demande a changé entre-temps (acompte payé ou remboursé) : rechargez la page.'));
+    app()->instance(AnswerCakeRequest::class, $answer);
+
+    Livewire::test(ViewCakeRequest::class, ['record' => $this->request->getRouteKey()])
+        ->callAction('decline', ['message' => 'Désolée'])
+        ->assertNotified('Cette demande a changé entre-temps');
+
+    Livewire::test(ViewCakeRequest::class, ['record' => $this->request->getRouteKey()])
+        ->callAction('propose', [
+            'total' => '85', 'deposit' => '25,50', 'allergens' => [Allergen::Eggs->value],
+            'slot' => 'Samedi 14 novembre', 'validity_days' => 3,
+        ])
+        ->assertNotified('Cette demande a changé entre-temps');
+
+    expect($this->request->refresh()->status)->toBe(RequestStatus::Nouvelle);
+    Mail::assertNothingQueued();
+});
+
 it('shows the request and the day load: paid deposits, capacity and open links', function () {
     CapacityOverride::create(['date' => '2026-11-14', 'capacity' => 3]);
     CakeRequest::factory()->create(['event_date' => '2026-11-14', 'status' => RequestStatus::Reservee]);
@@ -224,6 +282,20 @@ it('never serves a private request photo to a guest', function () {
     auth()->logout();
     $this->get($url)->assertForbidden();
     $this->get('/storage/requests/ABC234/photo.jpg')->assertForbidden();
+});
+
+it('refuses a private request photo to a signed-in account without the e-mail second factor', function () {
+    Storage::fake('local');
+    Storage::disk('local')->put('requests/ABC234/photo.jpg', 'jpeg-bytes');
+    $photo = $this->request->photos()->create([
+        'kind' => RequestPhoto::KIND_INSPIRATION,
+        'path' => 'requests/ABC234/photo.jpg',
+        'original_name' => 'photo.jpg',
+    ]);
+
+    $this->actingAs(User::factory()->create(['has_email_authentication' => false]));
+
+    $this->get(route('atelier.request-photo', $photo))->assertForbidden();
 });
 
 it('counts requests and paid deposits per source over the last 30 days', function () {
