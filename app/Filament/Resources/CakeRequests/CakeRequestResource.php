@@ -145,6 +145,22 @@ class CakeRequestResource extends Resource
                             ->label('Tarif de zone')
                             ->formatStateUsing(fn (?int $state): ?string => $euros($state))
                             ->placeholder('—'),
+                        // Typed by the client on the Stripe page, copied by the webhook (U8).
+                        TextEntry::make('delivery_address')
+                            ->label('Adresse de livraison (saisie au paiement)')
+                            ->visible(fn (CakeRequest $record): bool => filled($record->delivery_line1))
+                            ->state(fn (CakeRequest $record): string => collect([
+                                $record->delivery_name,
+                                $record->delivery_line1,
+                                $record->delivery_line2,
+                                trim($record->delivery_postal_code.' '.$record->delivery_city),
+                            ])->filter()->join(', ')),
+                        TextEntry::make('delivery_commune_mismatch')
+                            ->hiddenLabel()
+                            ->visible(fn (CakeRequest $record): bool => $record->delivery_commune_mismatch)
+                            ->badge()
+                            ->color('danger')
+                            ->state('Commune différente du tarif'),
                     ]),
                 Section::make('Client')
                     ->columns(2)
@@ -173,6 +189,14 @@ class CakeRequestResource extends Resource
                         TextEntry::make('offer_slot')
                             ->label('Créneau')
                             ->state(fn (CakeRequest $record): ?string => static::activeLink($record)?->slot),
+                        // AE5: the client can no longer pay this link while the date is full.
+                        TextEntry::make('offer_blocked')
+                            ->hiddenLabel()
+                            ->visible(fn (CakeRequest $record): bool => $record->status === RequestStatus::Proposee
+                                && app(CapacityGuard::class)->isFull($record->event_date))
+                            ->badge()
+                            ->color('danger')
+                            ->state('Bloqué : date complète'),
                     ]),
                 Section::make('Photos')
                     ->visible(fn (CakeRequest $record): bool => $record->photos->isNotEmpty())

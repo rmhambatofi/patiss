@@ -1,0 +1,67 @@
+@php($euros = fn (int $cents) => \App\Models\CakeType::formatEuros($cents))
+<x-layouts.public title="Acompte de votre commande">
+    <x-slot:head>
+        <meta name="robots" content="noindex">
+    </x-slot:head>
+
+    <h1 class="text-2xl font-bold sm:text-3xl">Réserver votre date</h1>
+    <p class="mt-2 text-stone-600">Référence de votre demande : <strong class="font-mono tracking-widest text-stone-900">{{ $request->reference }}</strong></p>
+
+    <dl class="mt-6 grid gap-x-6 gap-y-3 rounded-lg border border-stone-200 bg-white p-4 sm:grid-cols-[max-content_1fr] sm:p-6">
+        <dt class="font-semibold">Gâteau</dt>
+        <dd>{{ $request->typeLabel() }}, {{ $request->portions }} parts</dd>
+
+        <dt class="font-semibold">Date</dt>
+        <dd>{{ $request->event_date->locale('fr')->translatedFormat('l j F Y') }}</dd>
+
+        <dt class="font-semibold">Créneau</dt>
+        <dd>{{ $link->slot }}</dd>
+
+        <dt class="font-semibold">Prix total{{ $request->fulfilment === \App\Enums\Fulfilment::Delivery ? ', livraison comprise' : '' }}</dt>
+        <dd>{{ $euros($link->total_cents) }}</dd>
+
+        <dt class="font-semibold">Acompte à payer maintenant</dt>
+        <dd class="text-lg font-semibold">{{ $euros($link->deposit_cents) }}</dd>
+
+        <dt class="font-semibold">Solde</dt>
+        <dd>{{ $euros($link->balanceCents()) }}, à régler à la remise du gâteau</dd>
+
+        <dt class="font-semibold">Allergènes</dt>
+        <dd>
+            @if ($link->allergens->isEmpty())
+                Ce gâteau ne contient aucun des 14 allergènes réglementaires.
+            @else
+                {{ $link->allergens->map->label()->join(', ') }}
+            @endif
+        </dd>
+    </dl>
+
+    @if (filled($link->message))
+        <div class="mt-6 rounded-lg bg-stone-100 p-4">{!! nl2br(e($link->message)) !!}</div>
+    @endif
+
+    <p class="mt-6">
+        Ce lien est valable jusqu’au {{ $link->expires_at->timezone('Europe/Paris')->locale('fr')->translatedFormat('l j F Y \à H\hi') }}.
+        Votre date n’est réservée qu’une fois l’acompte payé.
+    </p>
+
+    @if ($request->fulfilment === \App\Enums\Fulfilment::Delivery)
+        <p class="mt-2 text-sm text-stone-600">L’adresse de livraison vous sera demandée sur la page de paiement.</p>
+    @endif
+
+    <form method="POST" action="{{ route('deposit.pay', $token) }}" class="mt-6 space-y-4">
+        @csrf
+        <label class="flex items-start gap-3">
+            <input type="checkbox" name="cgv" value="1" required class="mt-1 size-4" @checked(old('cgv'))>
+            <span>J’ai lu et j’accepte les <a href="{{ route('legal.terms') }}" target="_blank" class="underline">conditions générales de vente</a>, dont les conditions d’annulation.</span>
+        </label>
+        @error('cgv')
+            <p class="text-sm text-red-700">{{ $message }}</p>
+        @enderror
+
+        <button type="submit" class="w-full rounded-lg bg-stone-900 px-6 py-3 font-semibold text-white hover:bg-stone-700 sm:w-auto">
+            Payer l’acompte de {{ $euros($link->deposit_cents) }}
+        </button>
+        <p class="text-sm text-stone-600">Paiement sécurisé par carte bancaire (Apple Pay et Google Pay acceptés) sur la page Stripe.</p>
+    </form>
+</x-layouts.public>

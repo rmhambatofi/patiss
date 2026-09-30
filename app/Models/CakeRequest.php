@@ -14,7 +14,8 @@ use Illuminate\Support\Carbon;
 
 /**
  * A client's request for one cake (R6, R9). Customization, allergies and
- * phone are encrypted at rest (R19).
+ * phone are encrypted at rest (R19), like the delivery address copied from
+ * the Stripe page once the deposit is paid (U8).
  *
  * @property string $reference
  * @property string $kind 'type' or 'libre'
@@ -53,6 +54,12 @@ class CakeRequest extends Model
         'out_of_lead_time',
         'status',
         'last_activity_at',
+        'delivery_name',
+        'delivery_line1',
+        'delivery_line2',
+        'delivery_postal_code',
+        'delivery_city',
+        'delivery_commune_mismatch',
     ];
 
     protected function casts(): array
@@ -70,6 +77,12 @@ class CakeRequest extends Model
             'out_of_lead_time' => 'boolean',
             'status' => RequestStatus::class,
             'last_activity_at' => 'datetime',
+            'delivery_name' => 'encrypted',
+            'delivery_line1' => 'encrypted',
+            'delivery_line2' => 'encrypted',
+            'delivery_postal_code' => 'encrypted',
+            'delivery_city' => 'encrypted',
+            'delivery_commune_mismatch' => 'boolean',
         ];
     }
 
