@@ -31,3 +31,8 @@ Route::middleware(EnsureShopIsOpen::class)->controller(CakeRequestController::cl
         ->middleware('throttle:5,60')
         ->name('request.type.store');
 });
+
+// Atelier (U7): private request photos, served only to a logged-in atelier account (KTD7).
+// Class named as a string so this block needs no import at the top of the file.
+Route::get('/atelier-fichiers/photos/{photo}', 'App\Http\Controllers\RequestPhotoController')
+    ->name('atelier.request-photo');
