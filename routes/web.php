@@ -3,7 +3,9 @@
 use App\Http\Controllers\CakeRequestController;
 use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\CommuneSearchController;
+use App\Http\Controllers\DepositController;
 use App\Http\Controllers\RequestPhotoController;
+use App\Http\Controllers\StripeWebhookController;
 use App\Http\Middleware\EnsureShopIsOpen;
 use App\Models\DeliveryTier;
 use Illuminate\Support\Facades\Route;
@@ -41,3 +43,10 @@ Route::view('/confidentialite', 'legal.confidentialite')->name('legal.privacy');
 // Atelier (U7): private request photos, served only to a logged-in atelier account (KTD7).
 Route::get('/atelier-fichiers/photos/{photo}', RequestPhotoController::class)
     ->name('atelier.request-photo');
+
+// Deposit (U8, KTD4): public link pages and the Stripe webhook, the only place a deposit
+// becomes paid. "retour" is declared before the token route so that it is never read as a token.
+Route::get('/acompte/retour', [DepositController::class, 'return'])->name('deposit.return');
+Route::get('/acompte/{token}', [DepositController::class, 'show'])->name('deposit.show');
+Route::post('/acompte/{token}', [DepositController::class, 'pay'])->name('deposit.pay');
+Route::post('/stripe/webhook', StripeWebhookController::class)->name('stripe.webhook');

@@ -1,6 +1,12 @@
 <?php
 
+use App\Models\DepositLink;
+use App\Services\StripeGateway;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use Illuminate\Testing\TestResponse;
+use Tests\Fakes\FakeStripeGateway;
 use Tests\TestCase;
 
 /*
@@ -65,4 +71,82 @@ function jpegWithGpsExif(): string
     $app1 = "\xFF\xE1".pack('n', strlen($payload) + 2).$payload;
 
     return substr($jpeg, 0, 2).$app1.substr($jpeg, 2);
+}
+
+/**
+ * Replaces the Stripe gateway with an in-memory fake for the whole test.
+ */
+function fakeStripe(): FakeStripeGateway
+{
+    $fake = new FakeStripeGateway;
+    app()->instance(StripeGateway::class, $fake);
+
+    return $fake;
+}
+
+/**
+ * Posts a Stripe event signed as Stripe does: "t=<ts>,v1=<hmac_sha256(ts.payload)>".
+ */
+function postStripeWebhook(array $event, string $secret = 'whsec_test_secret'): TestResponse
+{
+    $payload = json_encode($event);
+    $timestamp = time();
+    $signature = hash_hmac('sha256', $timestamp.'.'.$payload, $secret);
+
+    return test()->call('POST', '/stripe/webhook', server: [
+        'CONTENT_TYPE' => 'application/json',
+        'HTTP_STRIPE_SIGNATURE' => "t={$timestamp},v1={$signature}",
+    ], content: $payload);
+}
+
+/**
+ * A checkout.session.completed event as Stripe sends it (API 2025+: shipping under collected_information).
+ *
+ * @param  array<string, mixed>  $session  Overrides merged into the session object.
+ */
+function checkoutCompletedEvent(DepositLink $link, array $session = []): array
+{
+    return [
+        'id' => 'evt_test_'.Str::random(12),
+        'object' => 'event',
+        'api_version' => '2026-08-26.dahlia',
+        'created' => now()->getTimestamp(),
+        'type' => 'checkout.session.completed',
+        'data' => ['object' => array_replace([
+            'id' => 'cs_test_link'.$link->id,
+            'object' => 'checkout.session',
+            'mode' => 'payment',
+            'status' => 'complete',
+            'payment_status' => 'paid',
+            'amount_total' => $link->deposit_cents,
+            'currency' => 'eur',
+            'created' => now()->subMinutes(5)->getTimestamp(),
+            'expires_at' => now()->addMinutes(25)->getTimestamp(),
+            'payment_intent' => 'pi_test_link'.$link->id,
+            'metadata' => [
+                'deposit_link_id' => (string) $link->id,
+                'cake_request_id' => (string) $link->cake_request_id,
+            ],
+            'customer_details' => ['email' => 'payeur@example.test', 'name' => 'Léa Martin'],
+            'collected_information' => ['shipping_details' => null],
+        ], $session)],
+    ];
+}
+
+/**
+ * Every e-mail actually sent through the array mailer, rendered as text.
+ *
+ * @return Collection<int, array{to: list<string>, subject: string, body: string}>
+ */
+function sentMails(): Collection
+{
+    return app('mailer')->getSymfonyTransport()->messages()->map(function ($sent) {
+        $email = $sent->getOriginalMessage();
+
+        return [
+            'to' => array_map(fn ($address) => $address->getAddress(), $email->getTo()),
+            'subject' => (string) $email->getSubject(),
+            'body' => html_entity_decode(strip_tags((string) $email->getHtmlBody()), ENT_QUOTES).' '.$email->getTextBody(),
+        ];
+    })->values();
 }
