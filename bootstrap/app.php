@@ -14,6 +14,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // Stripe signs its webhooks instead (KTD4).
         $middleware->validateCsrfTokens(except: ['stripe/webhook']);
+
+        // If a proxy in front of PHP handles HTTPS, trust only the scheme it forwards, so that
+        // the signed Livewire upload URLs of the atelier match the https URL the browser calls.
+        // X-Forwarded-For stays untrusted: the IP-based throttle of the request forms cannot be spoofed.
+        $middleware->trustProxies(at: '*', headers: Request::HEADER_X_FORWARDED_PROTO);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

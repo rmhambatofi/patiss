@@ -19,7 +19,7 @@
         <meta name="robots" content="noindex">
     </x-slot:head>
 
-    <h1 class="text-2xl font-bold sm:text-3xl">{{ $heading }}</h1>
+    <h1 class="heading-2">{{ $heading }}</h1>
     <p class="mt-4 text-lg">Référence de votre demande : <strong class="font-mono tracking-widest">{{ $reference }}</strong></p>
     <p class="mt-4">{{ $explanation }}</p>
 

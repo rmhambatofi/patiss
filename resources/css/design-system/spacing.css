@@ -1,0 +1,31 @@
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-14: 56px;
+  --space-16: 64px;
+  --space-18: 72px;
+  --space-20: 80px;
+  --space-24: 96px;
+
+  --container-max: 1200px;
+  --container-pad: 24px;
+  --section-pad-y: 56px;
+  --section-pad-y-lg: 72px;
+  --section-pad-y-xl: 96px;
+  --block-pad: clamp(32px, 5vw, 64px);
+  --grid-gap-cards: 24px;
+  --grid-gap-tiles: 14px;
+
+  --control-h-sm: 44px;
+  --control-h-md: 48px;
+  --control-h-lg: 52px;
+  --touch-min: 44px;
+}

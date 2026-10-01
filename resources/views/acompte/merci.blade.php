@@ -23,10 +23,10 @@
         <meta name="robots" content="noindex">
     </x-slot:head>
 
-    <h1 class="text-2xl font-bold sm:text-3xl">{{ $heading }}</h1>
+    <h1 class="heading-2">{{ $heading }}</h1>
     @if ($reference)
         <p class="mt-4 text-lg">Référence de votre demande : <strong class="font-mono tracking-widest">{{ $reference }}</strong></p>
     @endif
     <p class="mt-4">{{ $explanation }}</p>
-    <p class="mt-2 text-sm text-stone-600">Pensez à vérifier vos courriers indésirables si vous ne voyez pas l’e-mail.</p>
+    <p class="mt-2 text-sm text-muted">Pensez à vérifier vos courriers indésirables si vous ne voyez pas l’e-mail.</p>
 </x-layouts.public>

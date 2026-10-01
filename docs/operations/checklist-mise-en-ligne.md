@@ -7,7 +7,8 @@
 - [ ] Installation terminée selon [deploiement-o2switch.md](deploiement-o2switch.md) : PHP et extensions, base de données, racine du domaine sur `public/`, HTTPS actif, `/up` répond 200.
 - [ ] Limites PHP vérifiées sur le serveur (`upload_max_filesize` 10M, `post_max_size` 60M, `max_file_uploads` 5, `memory_limit` 512M, `max_execution_time` 60).
 - [ ] Cron « chaque minute » en place ; `php artisan schedule:list` affiche la tâche de file d'attente.
-- [ ] `.env` : `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL` en `https://`, `QUEUE_CONNECTION=database`.
+- [ ] `.env` : `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL` = adresse exacte de cet environnement en `https://`, `QUEUE_CONNECTION=database`, `SESSION_SECURE_COOKIE=true`, `SESSION_DOMAIN` vide (et `SESSION_COOKIE` propre à la recette).
+- [ ] `php artisan storage:link` lancé ; `http://` et `www.` redirigent vers `https://tahpatisserie.fr`.
 - [ ] E-mails configurés selon [emails-dns.md](emails-dns.md) : boîte du domaine, SPF, DKIM et DMARC valides, `MAIL_*` renseignés.
 - [ ] Stripe configuré en **mode test** selon [stripe.md](stripe.md) : clés `pk_test`/`sk_test`, webhook `https://<domaine>/stripe/webhook` avec `checkout.session.completed` et `checkout.session.expired`, `STRIPE_WEBHOOK_SECRET` de test.
 
@@ -37,6 +38,7 @@ Dans **Atelier → Réglages** :
 - [ ] Capacité (**Atelier → Capacité par date**) : exceptions saisies pour les jours déjà pris ou fermés.
 - [ ] Types de gâteaux saisis (**Atelier → Collection**) : description, photos, prix « à partir de », formats, **allergènes de la recette de base**. Chaque type visible a au moins une photo.
 - [ ] Une photo publiée, téléchargée depuis le site, ne contient ni EXIF ni GPS (par exemple avec `exiftool photo.jpg`).
+- [ ] Dans l'atelier, l'aperçu d'une photo existante se charge, et la console du navigateur (F12) n'affiche aucune erreur « CORS » ni « Mixed Content ».
 
 ## 5. Répétition complète F1 → F3 (mode test Stripe)
 

@@ -1,0 +1,35 @@
+:root {
+  --font-serif-display: 'Cormorant Garamond', Georgia, serif;
+  --font-sans-body: 'Manrope', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Display (serif) */
+  --text-display-1: clamp(44px, 6vw, 76px);   /* h1 hero */
+  --text-display-2: clamp(34px, 4vw, 52px);   /* h2 sections */
+  --text-display-3: clamp(32px, 3.6vw, 44px); /* h2 secondaires */
+  --text-title: 24px;                         /* h3 cartes produit */
+  --text-logo: 28px;
+  --text-quote: 26px;
+  --leading-display: 1.05;
+  --weight-display: 600;
+
+  /* Body (sans) */
+  --text-lead: 18px;
+  --text-body: 16px;
+  --text-body-sm: 15px;
+  --text-small: 14px;
+  --text-caption: 13px;
+  --text-micro: 12px;
+  --text-tag: 11px;
+  --leading-body: 1.6;
+  --leading-relaxed: 1.7;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  /* Étiquettes / eyebrows */
+  --tracking-eyebrow: 0.14em;
+  --tracking-tag: 0.06em;
+  --tracking-badge: 0.08em;
+}

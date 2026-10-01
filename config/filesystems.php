@@ -41,7 +41,10 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage',
+            // Relative on purpose: the URL follows the host the page was served from (localhost, 127.0.0.1,
+            // www or not, recette or prod). An absolute APP_URL here breaks the Filament upload preview,
+            // which fetches the file with JavaScript and is then blocked by CORS as soon as the hosts differ.
+            'url' => '/storage',
             'visibility' => 'public',
             'throw' => false,
             'report' => false,

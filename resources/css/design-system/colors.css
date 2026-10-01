@@ -1,0 +1,55 @@
+:root {
+  /* Base — palette Tah'Pâtisserie */
+  --tp-white: #FFFFFF;
+  --tp-lavender-white: #FCFAFE;
+  --tp-lilac-50: #F9F4FC;
+  --tp-lilac-100: #F4EDF9;
+  --tp-lilac-200: #EDE4F7;
+  --tp-lilac-300: #E3D6EE;
+  --tp-lilac-400: #D9C8E6;
+  --tp-rose-100: #FBEFF4;
+  --tp-rose-200: #F9E6EE;
+  --tp-rose-300: #F7E3EC;
+  --tp-rose-400: #F7C9DD;
+  --tp-amethyst: #6B2D8B;
+  --tp-plum: #4E1F68;
+  --tp-plum-ink: #2E1A3A;
+  --tp-plum-ink-2: #3E2A4A;
+  --tp-plum-gray: #5A4664;
+  --tp-plum-muted: #6E5A78;
+  --tp-plum-placeholder: #8E7A98;
+  --tp-gold: #B8860B;
+  --tp-lavender-pale: #E9DDF3;
+
+  /* Sémantique */
+  --bg-page: var(--tp-lavender-white);
+  --bg-section-soft: var(--tp-lilac-50);
+  --bg-footer: var(--tp-lilac-100);
+  --surface-card: var(--tp-white);
+  --surface-tint: var(--tp-lilac-200);
+  --surface-rose: var(--tp-rose-200);
+  --surface-icon: #F3EAF9;
+  --surface-dark: var(--tp-plum);
+  --border-subtle: var(--tp-lilac-200);
+  --border-default: var(--tp-lilac-300);
+  --border-strong: var(--tp-lilac-400);
+  --text-heading: var(--tp-plum-ink);
+  --text-body: var(--tp-plum-gray);
+  --text-muted: var(--tp-plum-muted);
+  --text-nav: #4A3555;
+  --text-on-accent: var(--tp-white);
+  --text-on-dark-soft: var(--tp-lavender-pale);
+  --text-placeholder: var(--tp-plum-placeholder);
+  --accent: var(--tp-amethyst);
+  --accent-strong: var(--tp-plum);
+  --accent-rating: var(--tp-gold);
+  --link: var(--tp-amethyst);
+  --link-hover: var(--tp-plum);
+
+  /* Dégradés */
+  --gradient-hero: linear-gradient(135deg, #FBE7F0 0%, #F3EAF9 55%, #EDE4F7 100%); /* @kind other */
+  --gradient-hero-vivid: linear-gradient(120deg, #F7C9DD 0%, #D9B8EC 50%, #A77BD1 100%); /* @kind other */
+  --gradient-block: linear-gradient(135deg, #F9E6EE, #EDE4F7); /* @kind other */
+  --gradient-placeholder: repeating-linear-gradient(135deg, #F1E6F7 0 14px, #F7EFFA 14px 28px); /* @kind other */
+  --gradient-placeholder-rose: repeating-linear-gradient(135deg, #F7E3EC 0 14px, #FBEFF4 14px 28px); /* @kind other */
+}

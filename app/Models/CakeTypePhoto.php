@@ -28,8 +28,12 @@ class CakeTypePhoto extends Model
         return $this->belongsTo(CakeType::class);
     }
 
+    /**
+     * Absolute URL on the current host (APP_URL outside a request, e.g. in a queued e-mail).
+     * The public disk URL itself is relative, see config/filesystems.php.
+     */
     public function url(): string
     {
-        return Storage::disk('public')->url($this->path);
+        return url(Storage::disk('public')->url($this->path));
     }
 }
