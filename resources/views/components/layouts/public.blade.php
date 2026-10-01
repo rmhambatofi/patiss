@@ -17,6 +17,7 @@
         <meta name="description" content="{{ $description }}">
     @endif
     {{ $head ?? '' }}
+    @fonts
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-screen overflow-x-clip bg-cream font-sans text-ink antialiased">
