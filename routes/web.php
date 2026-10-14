@@ -1,0 +1,60 @@
+<?php
+
+use App\Http\Controllers\CakeRequestController;
+use App\Http\Controllers\CollectionController;
+use App\Http\Controllers\CommuneSearchController;
+use App\Http\Controllers\ContactMessageController;
+use App\Http\Controllers\DepositController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\RequestPhotoController;
+use App\Http\Controllers\StripeWebhookController;
+use App\Http\Middleware\EnsureShopIsOpen;
+use App\Models\DeliveryTier;
+use Illuminate\Support\Facades\Route;
+
+// Vitrine v1 (KTD : pas de commande ni de paiement) : une page, un formulaire de contact.
+Route::get('/', HomeController::class)->name('home');
+Route::post('/contact', [ContactMessageController::class, 'store'])
+    ->middleware('throttle:5,60')
+    ->name('contact.store');
+
+// Collection et commande : hors périmètre de la vitrine v1, routes conservées mais non liées.
+Route::get('/gateaux', [CollectionController::class, 'index'])->name('collection.index');
+Route::get('/gateaux/{cakeType:slug}', [CollectionController::class, 'show'])->name('collection.show');
+Route::get('/sitemap.xml', [CollectionController::class, 'sitemap'])->name('sitemap');
+
+Route::get('/communes', CommuneSearchController::class)->name('communes.search');
+Route::get('/livraison', fn () => view('livraison', [
+    'tiers' => DeliveryTier::orderBy('max_km')->get(),
+]))->name('delivery.index');
+
+// Request forms (U5, U6): closed until the required settings are filled (KTD10),
+// submissions rate limited per IP (KTD11). The thanks route is declared first so
+// that "merci" is never read as a type slug.
+Route::middleware(EnsureShopIsOpen::class)->controller(CakeRequestController::class)->group(function () {
+    Route::get('/demande/merci', 'thanks')->name('request.thanks');
+    Route::get('/demande-libre', 'createFree')->name('request.free.create');
+    Route::post('/demande-libre', 'storeFree')
+        ->middleware('throttle:5,60')
+        ->name('request.free.store');
+    Route::get('/demande/{cakeType:slug}', 'createForType')->name('request.type.create');
+    Route::post('/demande/{cakeType:slug}', 'storeForType')
+        ->middleware('throttle:5,60')
+        ->name('request.type.store');
+});
+
+// Legal pages (U10): templates that read the shop settings (KTD10). They never show the pickup address.
+Route::view('/mentions-legales', 'legal.mentions-legales')->name('legal.notice');
+Route::view('/cgv', 'legal.cgv')->name('legal.terms');
+Route::view('/confidentialite', 'legal.confidentialite')->name('legal.privacy');
+
+// Atelier (U7): private request photos, served only to a logged-in atelier account (KTD7).
+Route::get('/atelier-fichiers/photos/{photo}', RequestPhotoController::class)
+    ->name('atelier.request-photo');
+
+// Deposit (U8, KTD4): public link pages and the Stripe webhook, the only place a deposit
+// becomes paid. "retour" is declared before the token route so that it is never read as a token.
+Route::get('/acompte/retour', [DepositController::class, 'return'])->name('deposit.return');
+Route::get('/acompte/{token}', [DepositController::class, 'show'])->name('deposit.show');
+Route::post('/acompte/{token}', [DepositController::class, 'pay'])->name('deposit.pay');
+Route::post('/stripe/webhook', StripeWebhookController::class)->name('stripe.webhook');

@@ -1,0 +1,14 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg-page);
+  color: var(--text-body);
+  font-family: var(--font-sans-body);
+  font-weight: var(--weight-regular);
+  -webkit-font-smoothing: antialiased;
+}
+*, *::before, *::after { box-sizing: border-box; }
+a { color: var(--link); text-decoration: none; }
+a:hover { color: var(--link-hover); }
+input::placeholder, textarea::placeholder { color: var(--text-placeholder); }
+@keyframes fadein { from { opacity: 0; } to { opacity: 1; } }

@@ -1,0 +1,22 @@
+:root {
+  /* Rayons : pilule pour toute action, 16 pour les champs et tuiles, 24 pour les cartes et blocs */
+  --radius-sm: 16px;
+  --radius-md: 24px;
+  --radius-pill: 9999px;
+  --radius-squircle: 30%;
+
+  /* Ombres : presque aucune. Le relief vient des aplats gris et des filets. */
+  --shadow-none: none;
+  --shadow-segment: 0 1px 2px rgba(0, 0, 0, 0.08);
+  --shadow-pill: 0 4px 16px rgba(0, 0, 0, 0.06);
+  --shadow-pill-strong: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-hover: rgba(0, 0, 0, 0.02) 0 0 0 1px, rgba(0, 0, 0, 0.04) 0 2px 6px, rgba(0, 0, 0, 0.1) 0 4px 8px;
+
+  /* Mouvement : fondu et changement de fond, jamais de rebond */
+  --ease-soft: ease; /* @kind other */
+  --duration-fast: 0.15s; /* @kind other */
+  --duration-base: 0.2s; /* @kind other */
+
+  /* Flou de l'étiquette posée sur une photo */
+  --blur-badge: blur(6px); /* @kind other */
+}

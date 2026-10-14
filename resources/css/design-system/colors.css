@@ -1,0 +1,44 @@
+:root {
+  /* Base — palette vitrine (structure Mobbin, couleurs Airbnb) */
+  --tp-white: #FFFFFF;
+  --tp-rausch: #FF385C;
+  --tp-rausch-active: #E00B41;
+  --tp-rausch-soft: #FFD1DA;
+  --tp-ink: #222222;
+  --tp-ink-soft: #3F3F3F;
+  --tp-gray-muted: #6A6A6A;
+  --tp-gray-faint: #929292;
+  --tp-gray-hairline: #DDDDDD;
+  --tp-gray-hairline-soft: #EBEBEB;
+  --tp-gray-surface: #F7F7F7;
+  --tp-gray-field: #F2F2F2;
+  --tp-error: #C13515;
+
+  /* Sémantique */
+  --bg-page: var(--tp-white);
+  --surface-card: var(--tp-white);
+  --surface-soft: var(--tp-gray-surface);
+  --surface-field: var(--tp-gray-field);
+  --surface-icon: var(--tp-gray-surface);
+  --surface-accent: var(--tp-rausch);
+  --border-subtle: var(--tp-gray-hairline-soft);
+  --border-default: var(--tp-gray-hairline);
+  --text-heading: var(--tp-ink);
+  --text-body: var(--tp-ink);
+  --text-body-soft: var(--tp-ink-soft);
+  --text-muted: var(--tp-gray-muted);
+  --text-faint: var(--tp-gray-faint);
+  --text-on-accent: var(--tp-white);
+  --text-placeholder: var(--tp-gray-muted);
+  --text-error: var(--tp-error);
+  --accent: var(--tp-rausch);
+  --accent-active: var(--tp-rausch-active);
+  --accent-disabled: var(--tp-rausch-soft);
+  --link: var(--tp-ink);
+  --link-hover: var(--tp-ink-soft);
+
+  /* Voiles (étiquette sur photo, fond de la visionneuse) */
+  --overlay-badge: rgba(115, 115, 115, 0.56); /* @kind other */
+  --scrim: rgba(0, 0, 0, 0.6); /* @kind other */
+  --focus-ring: 0 0 0 2px var(--tp-ink); /* @kind other */
+}

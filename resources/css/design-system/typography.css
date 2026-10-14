@@ -1,0 +1,39 @@
+:root {
+  /* Une seule famille : Hanken Grotesk (substitut ouvert de Saans). Graisses statiques :
+     652 de la maquette → 700, 456 → 400, 300 pour les chapôs. */
+  --font-sans-body: 'Hanken Grotesk', -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Titres */
+  --text-display: clamp(44px, 7vw, 80px);  /* h1 hero */
+  --text-heading-2: clamp(32px, 4vw, 44px); /* h2 sections */
+  --text-heading-3: 32px;                   /* h3 formulaires, chiffres clés */
+  --text-heading-4: 24px;                   /* h3 cartes */
+  --text-title: 20px;                       /* titres de valeurs / étapes */
+  --text-logo: 20px;
+  --leading-display: 1;
+  --leading-heading: 1.13;
+  --leading-card: 1.25;
+  --leading-title: 1.3;
+  --weight-display: 700;
+
+  /* Texte */
+  --text-lead: 20px;      /* chapô, graisse 300 */
+  --text-body: 16px;
+  --text-body-sm: 14px;
+  --text-caption: 13px;
+  --text-label: 12px;     /* libellés, étiquettes, numéros */
+  --text-tag: 11px;       /* étiquette sur photo, mobile */
+  --leading-body: 1.38;
+  --leading-body-sm: 1.43;
+  --leading-label: 1.33;
+  --leading-caption: 1.23;
+  --weight-light: 300;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  /* Pas d'interlettrage ni de capitales : la grotesque est posée telle quelle. */
+  --tracking-none: 0;
+}
