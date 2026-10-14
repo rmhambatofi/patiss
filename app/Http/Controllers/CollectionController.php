@@ -9,11 +9,6 @@ use Illuminate\View\View;
 
 class CollectionController extends Controller
 {
-    public function home(): View
-    {
-        return view('home', ['types' => $this->visibleTypes()]);
-    }
-
     public function index(): View
     {
         return view('collection.index', ['types' => $this->visibleTypes()]);

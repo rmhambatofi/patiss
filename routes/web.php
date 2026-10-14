@@ -3,14 +3,22 @@
 use App\Http\Controllers\CakeRequestController;
 use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\CommuneSearchController;
+use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\DepositController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RequestPhotoController;
 use App\Http\Controllers\StripeWebhookController;
 use App\Http\Middleware\EnsureShopIsOpen;
 use App\Models\DeliveryTier;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [CollectionController::class, 'home'])->name('home');
+// Vitrine v1 (KTD : pas de commande ni de paiement) : une page, un formulaire de contact.
+Route::get('/', HomeController::class)->name('home');
+Route::post('/contact', [ContactMessageController::class, 'store'])
+    ->middleware('throttle:5,60')
+    ->name('contact.store');
+
+// Collection et commande : hors périmètre de la vitrine v1, routes conservées mais non liées.
 Route::get('/gateaux', [CollectionController::class, 'index'])->name('collection.index');
 Route::get('/gateaux/{cakeType:slug}', [CollectionController::class, 'show'])->name('collection.show');
 Route::get('/sitemap.xml', [CollectionController::class, 'sitemap'])->name('sitemap');

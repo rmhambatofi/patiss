@@ -124,15 +124,3 @@ it('shows the deposit rate, cancellation terms and a link to the CGV on a type p
         ->assertSee('Acompte remboursé si annulation plus de 7 jours avant.')
         ->assertSee(url('/cgv'));
 });
-
-it('leads the home page with the collection ordered by sort order and a secondary free request link', function () {
-    visibleCakeType(['name' => 'Fraisier', 'sort_order' => 2, 'from_price_cents' => 5500]);
-    visibleCakeType(['name' => 'Number cake', 'sort_order' => 1, 'from_price_cents' => 4500]);
-
-    $this->get('/')
-        ->assertOk()
-        ->assertSeeInOrder(['Number cake', 'à partir de 45 €', 'Fraisier', 'à partir de 55 €'])
-        ->assertSee('Île-de-France et Oise')
-        ->assertSee('Demande libre')
-        ->assertSee(url('/demande-libre'));
-});

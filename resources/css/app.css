@@ -1,9 +1,9 @@
 @import 'tailwindcss';
 
 /*
- * Design system Tah'Pâtisserie (Claude Design) : tokens recopiés tels quels.
+ * Design system vitrine Tah'Pâtisserie (Claude Design) : tokens recopiés tels quels.
  * Les variables restent hors couche (elles l'emportent sur les valeurs par défaut de Tailwind,
- * ex. --radius-md = 14px) ; base.css va dans la couche base pour que les utilitaires gagnent.
+ * ex. --radius-md = 24px) ; base.css va dans la couche base pour que les utilitaires gagnent.
  */
 @import './design-system/colors.css';
 @import './design-system/typography.css';
@@ -16,77 +16,112 @@
 
 /*
  * Utilitaires Tailwind branchés sur les tokens du design system.
- * `inline` : l'utilitaire référence directement le token (var(--shadow-card), …) ;
+ * `inline` : l'utilitaire référence directement le token (var(--shadow-pill), …) ;
  * `reference` : Tailwind n'émet pas ces variables (elles se référenceraient elles-mêmes).
  * Ne jamais écrire de valeur en dur ici : ajouter le token dans le design system.
  */
 @theme inline reference {
     --font-sans: var(--font-sans-body);
-    --font-serif: var(--font-serif-display);
 
     /* Palette (noms courts utilisés dans les vues → token du design system) */
-    --color-cream: var(--tp-lavender-white);
-    --color-lilac-3: var(--tp-lilac-50);
-    --color-lilac-2: var(--tp-lilac-100);
-    --color-lilac: var(--tp-lilac-200);
-    --color-icon: var(--surface-icon);
-    --color-rose-light: var(--tp-rose-100);
-    --color-rose: var(--tp-rose-200);
-    --color-rose-strong: var(--tp-rose-400);
-    --color-line-soft: var(--tp-lilac-200);
-    --color-line: var(--tp-lilac-300);
-    --color-line-strong: var(--tp-lilac-400);
-    --color-amethyst: var(--tp-amethyst);
-    --color-plum: var(--tp-plum);
-    --color-ink: var(--tp-plum-ink);
-    --color-ink-2: var(--tp-plum-gray);
-    --color-muted: var(--tp-plum-muted);
-    --color-placeholder: var(--tp-plum-placeholder);
-    --color-nav: var(--text-nav);
-    --color-lavender-pale: var(--tp-lavender-pale);
-    --color-gold: var(--tp-gold);
+    --color-canvas: var(--bg-page);
+    --color-surface: var(--surface-soft);
+    --color-field: var(--surface-field);
+    --color-hairline: var(--border-default);
+    --color-hairline-soft: var(--border-subtle);
+    --color-ink: var(--text-heading);
+    --color-ink-soft: var(--text-body-soft);
+    --color-muted: var(--text-muted);
+    --color-faint: var(--text-faint);
+    --color-primary: var(--accent);
+    --color-primary-active: var(--accent-active);
+    --color-primary-soft: var(--accent-disabled);
+    --color-error: var(--text-error);
+    --color-overlay: var(--overlay-badge);
+    --color-scrim: var(--scrim);
 
-    /* Tailles de texte du design system */
-    --text-display-1: var(--text-display-1);
-    --text-display-2: var(--text-display-2);
-    --text-display-3: var(--text-display-3);
+    /* Tailles de texte */
+    --text-display: var(--text-display);
+    --text-h2: var(--text-heading-2);
+    --text-h3: var(--text-heading-3);
+    --text-h4: var(--text-heading-4);
     --text-title: var(--text-title);
     --text-logo: var(--text-logo);
     --text-lead: var(--text-lead);
+    --text-body: var(--text-body);
     --text-body-sm: var(--text-body-sm);
-    --text-small: var(--text-small);
     --text-caption: var(--text-caption);
-    --text-micro: var(--text-micro);
+    --text-label: var(--text-label);
     --text-tag: var(--text-tag);
 
-    --tracking-eyebrow: var(--tracking-eyebrow);
-    --tracking-tag: var(--tracking-tag);
-    --tracking-badge: var(--tracking-badge);
     --leading-display: var(--leading-display);
+    --leading-heading: var(--leading-heading);
+    --leading-card: var(--leading-card);
+    --leading-title: var(--leading-title);
+    --leading-body: var(--leading-body);
+    --leading-body-sm: var(--leading-body-sm);
+    --leading-label: var(--leading-label);
+    --leading-caption: var(--leading-caption);
 
-    /* Rayons */
+    /* Rayons : 16 (champs, tuiles), 24 (cartes, blocs), pilule, squircle 30 % */
     --radius-sm: var(--radius-sm);
     --radius-md: var(--radius-md);
-    --radius-lg: var(--radius-lg);
-    --radius-xl: var(--radius-xl);
-    --radius-card: var(--radius-card);
-    --radius-block: var(--radius-block);
-    --radius-hero: var(--radius-hero);
+    --radius-squircle: var(--radius-squircle);
 
-    /* Ombres teintées violet */
-    --shadow-card: var(--shadow-card);
-    --shadow-card-hover: var(--shadow-card-hover);
-    --shadow-float: var(--shadow-float);
-    --shadow-bar: var(--shadow-bar);
-    --shadow-image: var(--shadow-image);
-    --shadow-hero: var(--shadow-hero);
-    --shadow-button: var(--shadow-button);
-    --shadow-button-lg: var(--shadow-button-lg);
-    --shadow-button-hover: var(--shadow-button-hover);
+    /* Ombres : presque aucune */
+    --shadow-segment: var(--shadow-segment);
+    --shadow-pill: var(--shadow-pill);
+    --shadow-pill-strong: var(--shadow-pill-strong);
+    --shadow-hover: var(--shadow-hover);
 
     --container-site: var(--container-max);
+    --container-nav: var(--nav-max);
 
-    --animate-floaty: tp-floaty 7s var(--ease-soft) infinite;
+    --animate-fadein: fadein var(--duration-base) var(--ease-soft);
+}
+
+/*
+ * Alias transitoires : noms de l'ancien design system encore utilisés par les pages de
+ * commande (demande, acompte, livraison), hors périmètre de la première version de la vitrine.
+ * Ils pointent vers les nouveaux tokens pour que ces pages restent cohérentes ; ne pas les
+ * utiliser dans une nouvelle vue.
+ */
+@theme inline reference {
+    --color-cream: var(--bg-page);
+    --color-lilac-3: var(--surface-soft);
+    --color-lilac-2: var(--surface-soft);
+    --color-lilac: var(--surface-field);
+    --color-icon: var(--surface-icon);
+    --color-rose-light: var(--surface-soft);
+    --color-rose: var(--surface-soft);
+    --color-rose-strong: var(--border-default);
+    --color-line-soft: var(--border-subtle);
+    --color-line: var(--border-default);
+    --color-line-strong: var(--border-default);
+    --color-amethyst: var(--accent);
+    --color-plum: var(--text-heading);
+    --color-ink-2: var(--text-body-soft);
+    --color-placeholder: var(--text-placeholder);
+    --color-nav: var(--text-heading);
+    --color-lavender-pale: var(--text-faint);
+    --color-gold: var(--text-heading);
+    --text-display-1: var(--text-display);
+    --text-display-2: var(--text-heading-2);
+    --text-display-3: var(--text-heading-3);
+    --text-small: var(--text-body-sm);
+    --text-micro: var(--text-label);
+    --radius-card: var(--radius-md);
+    --radius-block: var(--radius-md);
+    --radius-hero: var(--radius-md);
+    --shadow-card: var(--shadow-none);
+    --shadow-card-hover: var(--shadow-hover);
+    --shadow-float: var(--shadow-pill);
+    --shadow-bar: var(--shadow-pill);
+    --shadow-image: var(--shadow-none);
+    --shadow-hero: var(--shadow-none);
+    --shadow-button: var(--shadow-none);
+    --shadow-button-lg: var(--shadow-none);
+    --shadow-button-hover: var(--shadow-none);
 }
 
 @layer base {
@@ -97,12 +132,12 @@
 
     input[type='file']::file-selector-button {
         margin-right: 0.75rem;
-        border: 1px solid var(--border-default);
+        border: 0;
         border-radius: var(--radius-pill);
-        background: var(--surface-card);
+        background: var(--surface-soft);
         padding: 0.5rem 1rem;
-        font-weight: 700;
-        color: var(--accent-strong);
+        font-weight: 600;
+        color: var(--text-heading);
         cursor: pointer;
     }
 }
@@ -117,61 +152,93 @@
         @apply mx-auto w-full max-w-site px-4 sm:px-6;
     }
 
-    /* Button — pilule, lift au survol, pas de dégradé */
+    /* Button — pilule, changement de fond au survol, pas d'ombre ni de transformation */
     .btn {
-        @apply inline-flex items-center justify-center gap-2 rounded-full leading-none font-bold whitespace-nowrap no-underline transition-[transform,box-shadow,background-color] duration-200 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amethyst disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0;
+        @apply inline-flex items-center justify-center gap-2 rounded-full leading-none font-semibold whitespace-nowrap no-underline transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink disabled:cursor-not-allowed disabled:opacity-50;
     }
-    .btn-sm { @apply h-11 px-5.5 text-sm; }
-    .btn-md { @apply h-12 px-6 text-sm; }
-    .btn-lg { @apply h-13 px-7 text-body-sm; }
-    .btn-primary { @apply bg-amethyst text-white shadow-button hover:text-white hover:shadow-button-hover; }
-    .btn-dark { @apply bg-plum text-white shadow-[0_12px_30px_rgba(78,31,104,0.35)] hover:text-white; }
-    .btn-secondary { @apply border border-line bg-white text-plum hover:bg-lilac-3 hover:text-plum; }
-    .btn-ghost { @apply border border-line-strong bg-transparent text-plum hover:bg-lilac-2 hover:text-plum; }
-    .btn-white { @apply bg-white text-plum hover:text-plum; }
+    .btn-sm { @apply h-11 px-4 text-body; }
+    .btn-md { @apply h-12 px-5 text-body; }
+    .btn-lg { @apply h-12 px-5 text-body; }
+    .btn-primary { @apply bg-primary text-white hover:bg-primary-active hover:text-white; }
+    .btn-secondary { @apply border border-hairline bg-white text-ink hover:bg-surface hover:text-ink; }
+    .btn-soft { @apply bg-surface text-ink hover:bg-hairline-soft hover:text-ink; }
+    .btn-dark { @apply bg-ink text-white hover:bg-ink-soft hover:text-white; }
+    .btn-ghost { @apply bg-surface text-ink hover:bg-hairline-soft hover:text-ink; }
+    .btn-white { @apply bg-white text-ink hover:bg-surface hover:text-ink; }
 
-    /* IconButton — rond 44px, bordure lilas */
+    /* IconButton — rond 44px, filet gris */
     .icon-btn {
-        @apply relative grid size-11 cursor-pointer place-items-center rounded-full border border-line bg-white p-0 text-plum transition-colors duration-200 hover:bg-lilac-2 hover:text-plum;
+        @apply relative grid size-11 cursor-pointer place-items-center rounded-full border border-hairline bg-white p-0 text-ink transition-colors duration-200 hover:bg-surface hover:text-ink;
+    }
+
+    /* Navigation flottante : pilule grise détachée du bord, 60px */
+    .nav-pill {
+        @apply flex h-15 items-center gap-2 rounded-full bg-surface pr-2 pl-5 max-md:shadow-pill;
+    }
+
+    /* Segmented control : piste grise, option active = pilule blanche (seule ombre douce autorisée) */
+    .seg { @apply flex flex-wrap gap-1 rounded-full bg-surface p-1; }
+    .seg-btn {
+        @apply h-10 cursor-pointer rounded-full border-0 bg-transparent px-4 text-body-sm font-semibold whitespace-nowrap text-muted transition-colors duration-200 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink;
+    }
+    .seg-btn-sm { @apply h-9 px-3.5; }
+    .seg-btn[aria-pressed='true'],
+    .seg-btn-active { @apply bg-white text-ink shadow-segment; }
+
+    /* Étiquette posée sur une photo : gris translucide, flou */
+    .badge-overlay {
+        @apply inline-flex items-center rounded-full bg-overlay px-3 py-1.5 text-label leading-label font-semibold whitespace-nowrap text-white backdrop-blur-[6px];
     }
 
     /* Typographie */
-    .eyebrow { @apply text-micro font-bold tracking-eyebrow text-amethyst uppercase; }
-    .heading-1 { @apply font-serif text-display-1 leading-[1.02] font-semibold text-balance text-ink; }
-    .heading-2 { @apply font-serif text-display-2 leading-display font-semibold text-balance text-ink; }
-    .heading-3 { @apply font-serif text-display-3 leading-display font-semibold text-balance text-ink; }
-    .heading-4 { @apply font-serif text-title leading-[1.2] font-semibold text-balance text-ink; }
-    .lead { @apply text-lead leading-relaxed text-pretty text-ink-2; }
-    .link {
-        @apply font-semibold text-amethyst underline decoration-amethyst/40 underline-offset-2 hover:text-plum hover:decoration-plum;
+    .heading-1 { @apply text-display leading-display font-bold text-balance text-ink; }
+    .heading-2 { @apply text-h2 leading-heading font-bold text-balance text-ink; }
+    .heading-3 { @apply text-h3 leading-heading font-bold text-balance text-ink; }
+    .heading-4 { @apply text-h4 leading-card font-bold text-balance text-ink; }
+    .title { @apply text-title leading-title font-semibold text-ink; }
+    .lead { @apply text-lead leading-body font-light text-pretty text-ink; }
+    .eyebrow { @apply text-label leading-label font-semibold text-muted; }
+    .link { @apply font-semibold text-ink underline decoration-hairline underline-offset-2 hover:decoration-ink; }
+    .link-arrow { @apply font-semibold text-ink hover:underline; }
+
+    /* Surfaces : carte blanche à filet gris, bloc gris */
+    .card { @apply overflow-hidden rounded-md border border-hairline-soft bg-white; }
+    .card-soft { @apply rounded-md bg-surface; }
+    .panel { @apply rounded-md border border-hairline-soft bg-white p-6 sm:p-8; }
+    .panel-soft { @apply rounded-md bg-surface p-6; }
+    .block-gradient { @apply rounded-md bg-surface p-(--block-pad); }
+
+    /* Carré d'icône : squircle 30 % */
+    .squircle { @apply grid shrink-0 place-items-center rounded-squircle; }
+
+    /* Chip / Badge : pilules grises, sans capitales ni interlettrage */
+    .chip { @apply inline-flex items-center rounded-full bg-surface px-3.5 py-2 text-body-sm leading-[1.3] font-semibold text-ink; }
+    .chip-lg { @apply inline-flex items-center rounded-full bg-surface px-4 py-2 text-body-sm leading-[1.3] font-semibold text-ink; }
+    .badge { @apply inline-flex items-center rounded-full bg-white px-2.5 py-1.5 text-tag leading-[1.2] font-semibold text-ink; }
+
+    /* Lien de contact : ligne blanche, squircle rouge, flèche ↗ */
+    .contact-link {
+        @apply flex items-center gap-3.5 rounded-sm bg-white py-3 pr-4 pl-3 text-ink transition-colors duration-200 hover:bg-hairline-soft hover:text-ink;
     }
-    .link-arrow { @apply border-b border-amethyst pb-0.5 text-sm font-bold text-amethyst hover:text-plum; }
 
-    /* Surfaces */
-    .panel { @apply rounded-card bg-white p-6 shadow-card sm:p-8; }
-    .panel-soft { @apply rounded-card bg-lilac-3 p-6; }
-    .block-gradient { @apply rounded-block bg-(image:--gradient-block) p-(--block-pad); }
+    /* Chiffre clé */
+    .stat { @apply flex flex-col gap-1 rounded-sm bg-surface p-4; }
 
-    /* Chip / Badge */
-    .chip { @apply inline-flex items-center rounded-full bg-white px-3.5 py-2 text-caption leading-[1.3] font-semibold text-plum; }
-    .chip-lg { @apply inline-flex items-center rounded-full bg-white px-3.5 py-1.75 text-micro leading-[1.3] font-bold tracking-badge text-amethyst uppercase; }
-    .badge { @apply inline-flex items-center rounded-full bg-white px-2.5 py-1.5 text-tag leading-[1.2] font-bold tracking-tag text-amethyst uppercase; }
-
-    /* TextField — pilule 48px, focus améthyste + halo 4px à 12 % */
-    .field-label { @apply text-caption font-bold text-ink; }
-    .field-hint { @apply text-xs text-muted; }
+    /* TextField — champ gris 48px rayon 16 sans bordure, focus = anneau 2px encre */
+    .field-label { @apply text-label leading-label font-semibold text-ink; }
+    .field-hint { @apply text-label leading-label text-muted; }
     .field-input {
-        @apply mt-2 block h-12 w-full rounded-full border border-line bg-white px-4.5 text-body-sm text-ink transition-[border-color,box-shadow] duration-200 outline-none focus:border-amethyst focus:shadow-[0_0_0_4px_rgba(107,45,139,0.12)];
+        @apply mt-2 block h-12 w-full rounded-sm border-0 bg-field px-4 text-body text-ink transition-shadow duration-150 outline-none focus:shadow-(--focus-ring);
     }
-    textarea.field-input { @apply h-auto min-h-30 resize-y rounded-[20px] py-3.5; }
+    textarea.field-input { @apply h-auto min-h-30 resize-y py-3 leading-body; }
     select.field-input { @apply cursor-pointer; }
 
-    /* Messages de formulaire (extension du site, absente du design system) */
-    .alert-error { @apply rounded-[20px] bg-red-50 px-4 py-3 text-sm text-red-800; }
-    .alert-warning { @apply rounded-[20px] bg-amber-50 px-4 py-3 text-sm text-amber-900; }
-    .field-error { @apply mt-1 text-sm text-red-700; }
+    /* Messages de formulaire */
+    .alert-error { @apply rounded-sm bg-surface px-4 py-3 text-body-sm text-error; }
+    .alert-warning { @apply rounded-sm bg-surface px-4 py-3 text-body-sm text-ink; }
+    .field-error { @apply mt-1 text-body-sm text-error; }
 
-    /* Placeholders photo : hachures lilas / rose */
-    .placeholder-lilac { background: var(--gradient-placeholder); }
-    .placeholder-rose { background: var(--gradient-placeholder-rose); }
+    /* Placeholders photo : aplat gris */
+    .placeholder-lilac,
+    .placeholder-rose { @apply bg-surface; }
 }

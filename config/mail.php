@@ -35,6 +35,19 @@ return [
     |
     */
 
+    /*
+    |--------------------------------------------------------------------------
+    | Dev Webhook
+    |--------------------------------------------------------------------------
+    |
+    | In the local environment only, every sent e-mail is also POSTed as HTML
+    | to this URL (see App\Listeners\ForwardMailToDevWebhook). Leave empty to
+    | disable. The log mailer keeps writing the e-mail to the Laravel log.
+    |
+    */
+
+    'dev_webhook_url' => env('MAIL_DEV_WEBHOOK_URL'),
+
     'mailers' => [
 
         'smtp' => [

@@ -4,10 +4,10 @@
 
 ## 1. Serveur
 
-- [ ] Installation terminée selon [deploiement-o2switch.md](deploiement-o2switch.md) : PHP et extensions, base de données, racine du domaine sur `public/`, HTTPS actif, `/up` répond 200.
+- [ ] Recette installée sur `https://stg.tahpatisserie.fr` selon [deploiement-o2switch.md](deploiement-o2switch.md) (dossier `~/patiss-stg`, base dédiée, répertoire protégé par mot de passe), puis production sur `https://tahpatisserie.fr` : PHP et extensions, base de données, document root sur `public/`, HTTPS actif, `/up` répond 200.
 - [ ] Limites PHP vérifiées sur le serveur (`upload_max_filesize` 10M, `post_max_size` 60M, `max_file_uploads` 5, `memory_limit` 512M, `max_execution_time` 60).
 - [ ] Cron « chaque minute » en place ; `php artisan schedule:list` affiche la tâche de file d'attente.
-- [ ] `.env` : `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL` = adresse exacte de cet environnement en `https://`, `QUEUE_CONNECTION=database`, `SESSION_SECURE_COOKIE=true`, `SESSION_DOMAIN` vide (et `SESSION_COOKIE` propre à la recette).
+- [ ] `.env` : `APP_ENV=staging` ou `production`, `APP_DEBUG=false`, `APP_URL` = adresse exacte de cet environnement en `https://`, `QUEUE_CONNECTION=database`, `SESSION_SECURE_COOKIE=true`, `SESSION_DOMAIN` vide (et `SESSION_COOKIE=tahpatisserie_stg_session` sur la recette), `MAIL_DEV_WEBHOOK_URL` vide.
 - [ ] `php artisan storage:link` lancé ; `http://` et `www.` redirigent vers `https://tahpatisserie.fr`.
 - [ ] E-mails configurés selon [emails-dns.md](emails-dns.md) : boîte du domaine, SPF, DKIM et DMARC valides, `MAIL_*` renseignés.
 - [ ] Stripe configuré en **mode test** selon [stripe.md](stripe.md) : clés `pk_test`/`sk_test`, webhook `https://<domaine>/stripe/webhook` avec `checkout.session.completed` et `checkout.session.expired`, `STRIPE_WEBHOOK_SECRET` de test.

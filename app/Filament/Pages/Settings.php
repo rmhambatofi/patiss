@@ -56,11 +56,46 @@ class Settings extends SettingsPage
                             ->regex('/^\d{14}$/')
                             ->validationMessages(['regex' => 'Le SIRET compte 14 chiffres, sans espace.']),
                         TextInput::make('notification_email')
-                            ->label('E-mail de notification des demandes')
+                            ->label('E-mail de notification')
+                            ->helperText('Reçoit les messages du formulaire de contact et les demandes.')
                             ->email(),
                         TextInput::make('google_review_url')
                             ->label('Lien d’avis Google')
                             ->url(),
+                    ]),
+                Section::make('Vitrine')
+                    ->description('Affiché sur la page d’accueil : présentation, canaux de contact et atelier.')
+                    ->schema([
+                        TextInput::make('artisan_first_name')
+                            ->label('Prénom de l’artisan')
+                            ->helperText('« Je m’appelle … » dans l’ouverture de la page.')
+                            ->maxLength(80),
+                        TextInput::make('whatsapp_number')
+                            ->label('Numéro WhatsApp')
+                            ->helperText('Format international sans espace, par exemple +33612345678.')
+                            ->regex('/^\+?\d{8,15}$/')
+                            ->validationMessages(['regex' => 'Le numéro s’écrit en chiffres, sans espace, avec l’indicatif (+33…).'])
+                            ->maxLength(20),
+                        TextInput::make('instagram_handle')
+                            ->label('Compte Instagram')
+                            ->prefix('@')
+                            ->maxLength(80),
+                        TextInput::make('facebook_url')
+                            ->label('Page Facebook')
+                            ->url()
+                            ->maxLength(255),
+                        TextInput::make('contact_email')
+                            ->label('E-mail de contact affiché')
+                            ->email()
+                            ->maxLength(255),
+                        Textarea::make('workshop_address')
+                            ->label('Adresse de l’atelier (affichée)')
+                            ->helperText('Visible sur le site, sous « Atelier, sur rendez-vous ». Laisser vide pour ne rien afficher.')
+                            ->rows(2),
+                        TextInput::make('workshop_hours')
+                            ->label('Horaires')
+                            ->placeholder('Mar – Sam : 9h – 18h')
+                            ->maxLength(80),
                     ]),
                 Section::make('Conditions de vente')
                     ->schema([

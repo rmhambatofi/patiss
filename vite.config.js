@@ -9,12 +9,9 @@ export default defineConfig({
             input: ['resources/css/app.css', 'resources/js/app.js', 'resources/js/demande.js'],
             refresh: true,
             fonts: [
-                bunny('Manrope', {
-                    weights: [400, 500, 600, 700],
-                }),
-                bunny('Cormorant Garamond', {
-                    weights: [500, 600, 700],
-                    styles: ['normal', 'italic'],
+                // Seule famille du design system vitrine (graisses statiques : 300 chapô, 400 texte, 600 titres courts, 700 display).
+                bunny('Hanken Grotesk', {
+                    weights: [300, 400, 500, 600, 700],
                 }),
             ],
         }),

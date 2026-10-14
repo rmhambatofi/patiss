@@ -48,9 +48,10 @@ Boost replaces these bootstrap instructions with guidelines tailored to the appl
 
 # Design system
 
-Toute page, vue Blade, composant ou style du site public suit le design system Tah'Pâtisserie (Claude Design : https://claude.ai/design/p/4b946b13-312a-4c84-8495-e04b779d1b7c).
+Toute page, vue Blade, composant ou style du site public suit le design system vitrine Tah'Pâtisserie (Claude Design : https://claude.ai/design/p/5ab6b005-c8df-4b0d-9a66-9e12bbac649d, maquette « Tah Patisserie Vitrine Mobbin Couleurs Airbnb »).
 
 - Lire `.claude/skills/tah-patisserie-design/SKILL.md` (et son `readme.md`) avant de créer ou modifier une page.
 - Tokens : `resources/css/design-system/` (copie conforme, ne pas éditer à la main). Branchement Tailwind et classes : `resources/css/app.css`.
 - Composants Blade `<x-ds.*>` dans `resources/views/components/ds/` : les utiliser avant d'écrire du balisage ; un besoin nouveau devient un composant `x-ds.*`.
 - Pas de couleur, ombre, rayon ou taille en dur dans les vues (hex, `rgba()`, `text-[..px]`) : utiliser les utilitaires branchés sur les tokens.
+- Périmètre v1 : vitrine (créations, artisane, atelier, contact). Tout ce qui concerne la commande (panier, demande, paiement) est hors périmètre et ne doit pas être lié depuis le site public.

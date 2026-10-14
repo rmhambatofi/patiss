@@ -1,8 +1,9 @@
 {{-- KTD12: Bakery with areaServed only. Never an address: the artisan works from home (R4). --}}
+{{-- The "@context" key is built in two parts: written literally, Blade compiles it as its @context directive. --}}
 @inject('shop', 'App\Settings\ShopSettings')
 <script type="application/ld+json">
 {!! json_encode([
-    '@context' => 'https://schema.org',
+    '@'.'context' => 'https://schema.org',
     '@type' => 'Bakery',
     'name' => $shop->business_name,
     'url' => url('/'),

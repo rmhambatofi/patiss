@@ -33,6 +33,13 @@ it('saves the shop settings and opens the forms once the required ones are fille
             'pickup_address' => '5 allée des Tilleuls',
             'google_review_url' => 'https://g.page/r/exemple/review',
             'notification_email' => 'atelier@example.test',
+            'artisan_first_name' => 'Lova',
+            'whatsapp_number' => '+33612345678',
+            'instagram_handle' => 'patisserie.lova',
+            'facebook_url' => 'https://facebook.com/patisserielova',
+            'contact_email' => 'bonjour@patisserie-lova.fr',
+            'workshop_address' => '3 rue des Fours, 77230 Dammartin-en-Goële',
+            'workshop_hours' => 'Mer – Sam : 10h – 18h',
         ])
         ->call('save')
         ->assertHasNoFormErrors();
@@ -41,7 +48,10 @@ it('saves the shop settings and opens the forms once the required ones are fille
     expect($settings->isOpenForRequests())->toBeTrue()
         ->and($settings->siret)->toBe('12345678901234')
         ->and($settings->pickup_address)->toBe('5 allée des Tilleuls')
-        ->and($settings->default_daily_capacity)->toBe(2);
+        ->and($settings->default_daily_capacity)->toBe(2)
+        ->and($settings->whatsapp_number)->toBe('+33612345678')
+        ->and($settings->whatsappDisplay())->toBe('06 12 34 56 78')
+        ->and($settings->workshopCity())->toBe('Dammartin-en-Goële');
 
     Livewire::test(Settings::class)->assertDontSee('Les formulaires de demande sont fermés');
 });
