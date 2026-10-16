@@ -2,13 +2,14 @@
 
 namespace App\Listeners;
 
+use App\Support\MailPolicy;
 use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Support\Facades\Http;
 use Throwable;
 
 /**
- * En développement local seulement : chaque e-mail envoyé (donc écrit dans le log par le mailer
- * « log ») est aussi transmis en POST, corps HTML, à l'URL MAIL_DEV_WEBHOOK_URL pour être lu
+ * Partout sauf en production : chaque e-mail envoyé (donc, en général, écrit dans le log par le
+ * mailer « log ») est aussi transmis en POST, corps HTML, à l'URL MAIL_DEV_WEBHOOK_URL pour être lu
  * dans un navigateur. Le log Laravel reste la trace de référence ; un échec du webhook est
  * signalé mais n'empêche jamais l'envoi.
  */
@@ -18,7 +19,7 @@ class ForwardMailToDevWebhook
     {
         $url = config('mail.dev_webhook_url');
 
-        if (! app()->isLocal() || blank($url)) {
+        if (! MailPolicy::forwardsToDevWebhook(app()->environment()) || blank($url)) {
             return;
         }
 

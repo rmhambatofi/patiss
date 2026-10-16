@@ -12,8 +12,8 @@ function sendOneMail(): void
     Mail::to('atelier@example.test')->send(new ContactMessageForArtisan($message));
 }
 
-it('forwards every sent e-mail as HTML to the dev webhook in the local environment, and still logs it', function () {
-    $this->app['env'] = 'local';
+it('forwards every sent e-mail as HTML to the dev webhook outside production, and still logs it', function (string $env) {
+    $this->app['env'] = $env;
     config(['mail.dev_webhook_url' => 'https://hook.example.test/inbox']);
     Http::fake();
 
@@ -26,9 +26,9 @@ it('forwards every sent e-mail as HTML to the dev webhook in the local environme
         && str_contains($request->body(), 'Un fraisier pour dimanche.')
         && str_contains($request->body(), '<'));
     expect(sentMails())->toHaveCount(1);
-});
+})->with(['local', 'staging', 'testing']);
 
-it('never calls the webhook outside the local environment nor without a configured URL', function () {
+it('never calls the webhook in production nor without a configured URL', function () {
     Http::fake();
 
     $this->app['env'] = 'production';
