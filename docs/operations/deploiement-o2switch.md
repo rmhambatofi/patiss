@@ -53,8 +53,8 @@ Les étapes valent pour les deux environnements. Commencer par la recette, et re
    - `SESSION_SECURE_COOKIE=true` ; laisser `SESSION_DOMAIN` vide (cookie limité à l'hôte exact) et, sur la recette, `SESSION_COOKIE=tahpatisserie_stg_session` pour que ses cookies ne se mélangent jamais avec ceux de la production (sinon erreurs « 419 Page expirée »).
    - `DB_CONNECTION=mysql` et les identifiants de la base **de cet environnement**.
    - `QUEUE_CONNECTION=database`.
-   - `MAIL_MAILER=smtp` avec l'adresse du domaine créée dans cPanel (voir `emails-dns.md`). Sur la recette, on peut garder `MAIL_MAILER=log` : les e-mails (codes de connexion compris) se lisent alors dans `storage/logs/laravel.log`.
-   - `MAIL_DEV_WEBHOOK_URL` : laisser vide. Il ne sert qu'au poste de développement.
+   - `MAIL_MAILER=smtp` avec l'adresse du domaine créée dans cPanel (voir `emails-dns.md`). En production le SMTP est toujours utilisé, quel que soit `MAIL_MAILER`, et le contenu des e-mails n'est jamais écrit dans le log ; si le SMTP n'est pas configuré, chaque envoi journalise une erreur. Sur la recette (`APP_ENV=staging`) et sur tout environnement qui n'est ni `local` ni `production`, les e-mails (codes de connexion compris) restent dans `storage/logs/laravel.log` même avec `MAIL_MAILER=smtp` : un avertissement est alors journalisé à chaque envoi (voir `App\Support\MailPolicy`).
+   - `MAIL_DEV_WEBHOOK_URL` : laisser vide en production (il y est de toute façon ignoré). Sur la recette, on peut y mettre l'adresse d'une boîte de réception web : chaque e-mail y est alors aussi transmis en POST (HTML).
    - `STRIPE_KEY`, `STRIPE_SECRET`, `STRIPE_WEBHOOK_SECRET` : hors périmètre de la vitrine, laisser vides (voir `stripe.md` le jour où la commande en ligne sera activée).
 
    Puis lancer :
@@ -113,6 +113,6 @@ php artisan optimize
 
 - Les photos publiques sont servies en adresse relative (`/storage/…`, voir `config/filesystems.php`) : elles suivent l'hôte de la page, quel que soit `APP_URL`. C'est ce qui évite les blocages CORS de l'aperçu des photos dans l'atelier.
 - Quand `APP_URL` est en `https://`, toutes les adresses générées sont en `https://` (`AppServiceProvider`). Si un proxy gère le HTTPS devant PHP, seul son en-tête `X-Forwarded-Proto` est pris en compte (`bootstrap/app.php`) ; `X-Forwarded-For` ne l'est pas, pour que la limite d'envois par IP du formulaire de contact ne puisse pas être contournée.
-- En local : `php artisan storage:link` une fois, puis ouvrir le site sur l'hôte de son choix (`localhost`, `127.0.0.1`, `.test`) ; `APP_URL` ne sert qu'aux e-mails. Avec `MAIL_DEV_WEBHOOK_URL` renseigné, chaque e-mail envoyé est aussi transmis en POST (HTML) à cette adresse, uniquement en environnement `local`.
+- En local : `php artisan storage:link` une fois, puis ouvrir le site sur l'hôte de son choix (`localhost`, `127.0.0.1`, `.test`) ; `APP_URL` ne sert qu'aux e-mails. Avec `MAIL_DEV_WEBHOOK_URL` renseigné, chaque e-mail envoyé est aussi transmis en POST (HTML) à cette adresse, dans tout environnement sauf `production`. `MAIL_MAILER=smtp` n'est respecté qu'en `local` et en `production`.
 - `php artisan schedule:list` affiche la tâche de file d'attente.
 - Les pages de commande (`/gateaux`, `/demande-libre`, `/acompte/…`) existent encore mais ne sont plus liées depuis le site. Tant que les réglages obligatoires (adresse professionnelle, SIRET, taux d'acompte, conditions d'annulation, durée des liens) sont vides, elles affichent « Commandes bientôt ouvertes ».

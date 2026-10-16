@@ -1,5 +1,17 @@
 <?php
 
+use App\Support\MailPolicy;
+
+// Le mailer réellement utilisé dépend de MAIL_MAILER et de APP_ENV (voir App\Support\MailPolicy) :
+// hors local et production, un MAIL_MAILER=smtp reste dans le log ; en production le SMTP est
+// toujours utilisé. Le calcul est fait ici, et non au démarrage, pour survivre à `config:cache`
+// (après quoi env() ne lit plus le fichier .env).
+$policy = MailPolicy::resolve(
+    requestedMailer: env('MAIL_MAILER'),
+    appEnv: env('APP_ENV'),
+    smtpConfigured: MailPolicy::smtpConfigured(env('MAIL_URL'), env('MAIL_HOST'), env('MAIL_USERNAME'), env('MAIL_PASSWORD')),
+);
+
 return [
 
     /*
@@ -12,9 +24,16 @@ return [
     | the message. All additional mailers can be configured within the
     | "mailers" array. Examples of each type of mailer are provided.
     |
+    | Here it is the result of App\Support\MailPolicy, not MAIL_MAILER alone.
+    | "policy_reason" explains a deviation from MAIL_MAILER so that
+    | App\Listeners\LogMailPolicyDeviation can log a warning or an error at
+    | sending time.
+    |
     */
 
-    'default' => env('MAIL_MAILER', 'log'),
+    'default' => $policy['mailer'],
+
+    'policy_reason' => $policy['reason'],
 
     /*
     |--------------------------------------------------------------------------
@@ -40,9 +59,9 @@ return [
     | Dev Webhook
     |--------------------------------------------------------------------------
     |
-    | In the local environment only, every sent e-mail is also POSTed as HTML
-    | to this URL (see App\Listeners\ForwardMailToDevWebhook). Leave empty to
-    | disable. The log mailer keeps writing the e-mail to the Laravel log.
+    | In every environment except production, every sent e-mail is also POSTed
+    | as HTML to this URL (see App\Listeners\ForwardMailToDevWebhook). Leave
+    | empty to disable. The log mailer keeps writing the e-mail to the log.
     |
     */
 
